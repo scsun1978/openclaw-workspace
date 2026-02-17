@@ -1,0 +1,77 @@
+{
+  "name": "stock-simgame",
+  "goal": "基于ADR-001启动股市模拟游戏MVP",
+  "mode": "linear",
+  "status": "active",
+  "created_at": "2026-02-17T16:25:13.165365",
+  "stages": {
+    "scsun-code-agent": {
+      "status": "done",
+      "task": "提交MVP技术设计v1：交易核心（买/卖/持仓/盈亏，单账本+操作日志）、TutorialStateMachine、基础任务/成就、双轨数据接口抽象；并提供4个测试Hook（seed注入/时间快进/事件强触发/状态查询）和WS降级方案",
+      "output": "已收到Code回传：MVP技术设计v1、4个测试Hook规范、WS降级与一致性方案；可进入QA阶段。",
+      "logs": [
+        {
+          "timestamp": "2026-02-17T16:31:22.909782",
+          "action": "Status changed to in-progress"
+        },
+        {
+          "timestamp": "2026-02-17T16:35:57.811945",
+          "action": "Status changed to done"
+        }
+      ],
+      "agent": "scsun-code-agent",
+      "startedAt": null,
+      "completedAt": null
+    },
+    "scsun-qa-agent": {
+      "status": "done",
+      "task": "提交MVP质量门禁（Week2/4/5）、一致性测试矩阵（WS断连重连/双轨可复现与切换/教学交易冲突边界）、发布准入规则（PASS/CONDITIONAL PASS/BLOCK）",
+      "output": "已收到QA回传：MVP质量门禁（Week2/4/5）、一致性测试矩阵（WS/双轨/教学冲突）、发布准入规则与缺陷/回归模板，进入Docs阶段。",
+      "logs": [
+        {
+          "timestamp": "2026-02-17T16:35:57.864154",
+          "action": "Status changed to in-progress"
+        },
+        {
+          "time": "2026-02-17T09:04:19.182177+00:00",
+          "event": "status: in-progress → done"
+        }
+      ],
+      "completedAt": "2026-02-17T09:04:19.181888+00:00",
+      "agent": "scsun-qa-agent",
+      "startedAt": null
+    },
+    "scsun-docs-agent": {
+      "status": "in-progress",
+      "task": "提交PRD.md、quick-start.md、glossary.md初稿；补充数据透明策略与评分可解释文档；输出知识点触发矩阵模板（字段级）",
+      "output": "",
+      "logs": [
+        {
+          "time": "2026-02-17T09:05:05.122889+00:00",
+          "event": "status: pending → in-progress"
+        }
+      ],
+      "agent": "scsun-docs-agent",
+      "startedAt": "2026-02-17T09:05:05.122232+00:00",
+      "completedAt": null
+    },
+    "scsun-monitor-agent": {
+      "status": "pending",
+      "task": "汇总code/qa/docs交付并输出Gate Review v1，给出GREEN/YELLOW/RED与下一步调度建议",
+      "output": "",
+      "logs": [],
+      "agent": "scsun-monitor-agent",
+      "startedAt": null,
+      "completedAt": null
+    }
+  },
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "updated": "2026-02-17T09:05:05.122896+00:00",
+  "currentStage": "scsun-docs-agent",
+  "project": "stock-simgame"
+}

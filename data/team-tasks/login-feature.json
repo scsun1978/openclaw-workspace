@@ -1,0 +1,90 @@
+{
+  "name": "login-feature",
+  "goal": "实现用户登录功能，包括代码、测试和文档",
+  "mode": "linear",
+  "status": "active",
+  "created_at": "2026-02-17T13:35:00",
+  "stages": {
+    "code-agent": {
+      "status": "done",
+      "task": "实现登录 API：POST /api/login",
+      "output": "已完成登录接口开发，包括 JWT token 生成和验证",
+      "logs": [
+        {
+          "timestamp": "2026-02-17T13:20:00",
+          "action": "Status changed to in-progress"
+        },
+        {
+          "timestamp": "2026-02-17T13:30:00",
+          "action": "Status changed to done"
+        }
+      ],
+      "agent": "code-agent",
+      "startedAt": null,
+      "completedAt": null
+    },
+    "qa-agent": {
+      "status": "done",
+      "task": "编写登录功能的测试用例",
+      "output": "✅ 测试用例已完成\n- 成功登录: PASS\n- 密码错误: PASS\n- 用户不存在: PASS\n- 空参数: PASS\n- Token 过期: PASS\n- Token 篡改: PASS\n\n覆盖率: 95%\n发布建议: CONDITIONAL PASS（建议增加限流测试）",
+      "logs": [
+        {
+          "timestamp": "2026-02-17T13:35:00",
+          "action": "Status changed to in-progress"
+        },
+        {
+          "timestamp": "2026-02-17T13:40:00",
+          "action": "Status changed to done"
+        }
+      ],
+      "agent": "qa-agent",
+      "startedAt": null,
+      "completedAt": null
+    },
+    "docs-agent": {
+      "status": "done",
+      "task": "编写登录 API 的使用文档",
+      "output": "✅ 文档已输出：docs/api/login-api.md\n\n内容摘要：\n- 3 种语言的请求示例（curl/JS/Python）\n- JWT Token 完整使用指南（携带/刷新/过期处理）\n- 8 种错误码 + 解决方案\n- 6 项安全注意事项（含存储方式对比表）\n- 4 个 FAQ\n\nQA 状态：已覆盖 qa-agent 提出的所有测试场景\n文档状态：待最终审核",
+      "logs": [
+        {
+          "timestamp": "2026-02-17T13:45:00",
+          "action": "Status changed to in-progress"
+        },
+        {
+          "timestamp": "2026-02-17T13:50:00",
+          "action": "Status changed to done"
+        }
+      ],
+      "agent": "docs-agent",
+      "startedAt": null,
+      "completedAt": null
+    },
+    "monitor-agent": {
+      "status": "done",
+      "task": "审核登录功能的实现和测试结果",
+      "output": "✅ 最终审核完成（模拟）\n\n【审核结论】\n1. 代码实现: ✅ 符合安全标准，JWT 实现正确\n2. 测试覆盖: ✅ 95% 覆盖率，建议增加限流测试\n3. 文档质量: ✅ 清晰完整，包含所有必要信息\n\n【发布建议】CONDITIONAL PASS\n- 可以发布到测试环境\n- 建议在上线前增加限流测试\n- 建议增加日志审计功能\n\n【状态】✅ 项目完成（演示项目）",
+      "logs": [
+        {
+          "timestamp": "2026-02-17T13:50:00",
+          "action": "Status changed to in-progress"
+        },
+        {
+          "timestamp": "2026-02-17T15:54:00",
+          "action": "Status changed to done (heartbeat cleanup)"
+        }
+      ],
+      "agent": "monitor-agent",
+      "startedAt": null,
+      "completedAt": null
+    }
+  },
+  "pipeline": [
+    "code-agent",
+    "qa-agent",
+    "docs-agent",
+    "monitor-agent"
+  ],
+  "completed_at": "2026-02-17T15:54:00",
+  "final_status": "CONDITIONAL PASS",
+  "project": "login-feature"
+}
