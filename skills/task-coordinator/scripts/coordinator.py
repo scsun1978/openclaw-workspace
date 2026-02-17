@@ -45,6 +45,8 @@ TIMEOUT_THRESHOLDS = {
 # 推送策略
 MAX_PUSH_ATTEMPTS = 3
 BACKOFF_MINUTES = 5
+# 去重冷却（同一 project/stage 在该时间内不重复推送）
+PUSH_COOLDOWN_MINUTES = 15
 
 
 def ensure_logs_dir():
@@ -168,28 +170,40 @@ def check_project(project_file: Path) -> Optional[Dict]:
         return None
 
 
-def get_push_count_today(project: str, stage: str) -> int:
-    """获取今天的推送次数"""
+def _read_today_logs() -> List[Dict]:
     log_file = get_log_file()
-    
     if not log_file.exists():
-        return 0
-    
+        return []
     with open(log_file, 'r') as f:
         try:
-            logs = json.load(f)
-        except:
-            return 0
-    
-    # 统计今天的推送次数
+            return json.load(f)
+        except Exception:
+            return []
+
+
+def get_push_count_today(project: str, stage: str) -> int:
+    """获取今天的推送次数"""
+    logs = _read_today_logs()
     count = 0
     for log in logs:
         if (log.get('project') == project and
             log.get('stage') == stage and
-            log.get('action') == 'auto-push'):
+            log.get('action') == 'auto-push' and
+            log.get('result') == 'success'):
             count += 1
-    
     return count
+
+
+def get_last_success_push_time(project: str, stage: str) -> Optional[datetime]:
+    """获取最近一次成功推送时间（用于去重冷却）"""
+    logs = _read_today_logs()
+    for log in reversed(logs):
+        if (log.get('project') == project and
+            log.get('stage') == stage and
+            log.get('action') == 'auto-push' and
+            log.get('result') == 'success'):
+            return parse_iso_datetime(log.get('timestamp'))
+    return None
 
 
 def push_to_agent(project: str, task_info: Dict) -> Dict:
@@ -209,8 +223,24 @@ def push_to_agent(project: str, task_info: Dict) -> Dict:
     if push_count >= MAX_PUSH_ATTEMPTS:
         return {
             'success': False,
-            'error': f'Max push attempts reached ({MAX_PUSH_ATTEMPTS})'
+            'error': f'Max push attempts reached ({MAX_PUSH_ATTEMPTS})',
+            'skipped': True,
+            'reason': 'max-attempts'
         }
+
+    # 去重冷却：避免短时间重复催办，减少 sessions_send timeout 噪音
+    last_push_time = get_last_success_push_time(project, stage_name)
+    if last_push_time:
+        now = datetime.now(last_push_time.tzinfo) if last_push_time.tzinfo else datetime.now()
+        diff_minutes = (now - last_push_time).total_seconds() / 60
+        if diff_minutes < PUSH_COOLDOWN_MINUTES:
+            return {
+                'success': False,
+                'error': f'Cooldown active ({diff_minutes:.1f}m < {PUSH_COOLDOWN_MINUTES}m), skip duplicate push',
+                'skipped': True,
+                'reason': 'cooldown',
+                'cooldown_minutes_left': round(PUSH_COOLDOWN_MINUTES - diff_minutes, 1)
+            }
     
     # 构造推送消息
     message = f"""
@@ -302,7 +332,8 @@ def main():
                         'project': task['project'],
                         'stage': task['stage'],
                         'action': 'auto-push',
-                        'result': 'success' if result['success'] else 'failed',
+                        'result': 'success' if result['success'] else ('skipped' if result.get('skipped') else 'failed'),
+                        'reason': result.get('reason'),
                         'error': result.get('error'),
                         'push_count': result.get('push_count', 0)
                     }
@@ -311,6 +342,8 @@ def main():
                     
                     if result['success']:
                         print(f"  ✅ {task['project']}/{task['stage']}: 推送成功")
+                    elif result.get('skipped'):
+                        print(f"  ⏭️  {task['project']}/{task['stage']}: {result['error']}")
                     else:
                         print(f"  ❌ {task['project']}/{task['stage']}: {result['error']}")
         else:
