@@ -1,0 +1,34 @@
+{
+  "check_interval_minutes": 5,
+  "timeout_threshold_minutes": 10,
+  "max_push_attempts": 3,
+  "backoff_minutes": 5,
+  "projects_dir": "/Users/shengchun.sun/.openclaw/workspace/data/team-tasks",
+  "logs_dir": "/Users/shengchun.sun/.openclaw/workspace/logs",
+  "agents": {
+    "code-agent": "agent:scsun-code-agent:telegram:group:-5107037842",
+    "test-agent": "agent:scsun-qa-agent:telegram:group:-5294088642",
+    "qa-agent": "agent:scsun-qa-agent:telegram:group:-5294088642",
+    "docs-agent": "agent:scsun-docs-agent:telegram:group:-5277020999",
+    "monitor-bot": "agent:scsun-monitor-agent:telegram:group:-5186938821",
+    "monitor-agent": "agent:scsun-monitor-agent:telegram:group:-5186938821"
+  },
+  "timeout_thresholds": {
+    "code-agent": 15,
+    "test-agent": 10,
+    "qa-agent": 10,
+    "docs-agent": 10,
+    "monitor-bot": 5,
+    "monitor-agent": 5
+  },
+  "push_strategy": {
+    "max_attempts": 3,
+    "backoff_minutes": 5,
+    "escalation": true,
+    "escalation_target": "monitor-bot"
+  },
+  "alerts": {
+    "stuck_threshold_minutes": 30,
+    "alert_channel": "monitor-bot"
+  }
+}
