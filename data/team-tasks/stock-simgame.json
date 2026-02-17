@@ -2,7 +2,7 @@
   "name": "stock-simgame",
   "goal": "基于ADR-001启动股市模拟游戏MVP",
   "mode": "linear",
-  "status": "active",
+  "status": "completed",
   "created_at": "2026-02-17T16:25:13.165365",
   "stages": {
     "scsun-code-agent": {
@@ -42,27 +42,40 @@
       "startedAt": null
     },
     "scsun-docs-agent": {
-      "status": "in-progress",
+      "status": "done",
       "task": "提交PRD.md、quick-start.md、glossary.md初稿；补充数据透明策略与评分可解释文档；输出知识点触发矩阵模板（字段级）",
-      "output": "",
+      "output": "已收到Docs回传：PRD/quick-start/glossary/data-transparency-policy/scoring-explained/knowledge-trigger-matrix 共6份文档完成，进入Monitor最终审核阶段。",
       "logs": [
         {
           "time": "2026-02-17T09:05:05.122889+00:00",
           "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-17T09:36:39.854794+00:00",
+          "event": "status: in-progress → done"
         }
       ],
       "agent": "scsun-docs-agent",
       "startedAt": "2026-02-17T09:05:05.122232+00:00",
-      "completedAt": null
+      "completedAt": "2026-02-17T09:36:39.854465+00:00"
     },
     "scsun-monitor-agent": {
-      "status": "pending",
+      "status": "done",
       "task": "汇总code/qa/docs交付并输出Gate Review v1，给出GREEN/YELLOW/RED与下一步调度建议",
-      "output": "",
-      "logs": [],
+      "output": "Gate Review v1：综合 code/qa/docs 交付，流程完整跑通（4/4）；结论 CONDITIONAL PASS。允许进入下一轮实现，但发布前需补齐三项：1) 代码与文档产物同步到统一主仓并给出commit证据；2) WS降级与双轨一致性做最小可复现验证；3) 评分可解释与数据透明文档做用户可见入口联调。",
+      "logs": [
+        {
+          "time": "2026-02-17T09:36:39.921829+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-17T09:38:39.491384+00:00",
+          "event": "status: in-progress → done"
+        }
+      ],
       "agent": "scsun-monitor-agent",
-      "startedAt": null,
-      "completedAt": null
+      "startedAt": "2026-02-17T09:36:39.921597+00:00",
+      "completedAt": "2026-02-17T09:38:39.491162+00:00"
     }
   },
   "pipeline": [
@@ -71,7 +84,16 @@
     "scsun-docs-agent",
     "scsun-monitor-agent"
   ],
-  "updated": "2026-02-17T09:05:05.122896+00:00",
-  "currentStage": "scsun-docs-agent",
-  "project": "stock-simgame"
+  "updated": "2026-02-17T09:38:39.491395+00:00",
+  "currentStage": null,
+  "project": "stock-simgame",
+  "meta": {
+    "phase": "phase-1-design",
+    "completionSemantics": "design-review-complete-not-implementation",
+    "updatedBy": "scsun-monitor-agent",
+    "updatedAt": "2026-02-17T13:05:47.817574Z"
+  },
+  "notes": [
+    "Phase-1（方案/评审）已完成；尚未进入可发布代码实现阶段。"
+  ]
 }

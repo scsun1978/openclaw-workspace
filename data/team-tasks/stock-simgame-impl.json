@@ -1,0 +1,59 @@
+{
+  "project": "stock-simgame-impl",
+  "goal": "基于已完成方案实现可运行MVP（含代码/测试/文档/发布证据）",
+  "created": "2026-02-17T13:06:00.624082+00:00",
+  "updated": "2026-02-17T13:06:07.626790+00:00",
+  "status": "active",
+  "mode": "linear",
+  "workspace": "",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": "scsun-code-agent",
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "in-progress",
+      "task": "实现MVP代码并提交证据：1) 提供repo_path；2) 提供commit_sha；3) changed_files>=5；4) 最小可运行命令与输出；5) 产出目录结构与关键模块说明。缺任一项不得标记done。",
+      "startedAt": "2026-02-17T13:06:07.626515+00:00",
+      "completedAt": null,
+      "output": "",
+      "logs": [
+        {
+          "time": "2026-02-17T13:06:07.626783+00:00",
+          "event": "status: pending → in-progress"
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "pending",
+      "task": "基于实现代码执行验证：1) 提供test_command；2) 测试结果摘要（通过/失败数）；3) 关键缺陷列表（可复现步骤）；4) 回归结论 PASS/CONDITIONAL PASS/BLOCK。无真实测试输出不得done。",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "pending",
+      "task": "基于已落地代码更新文档：1) README快速启动可跑通；2) API/模块说明对应实际文件；3) 发布变更记录含commit_sha；4) 已知限制与排障。无文件路径和commit关联不得done。",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "pending",
+      "task": "最终Gate Review（实现阶段）：核验三方证据完整性（repo_path/commit_sha/test输出/文档链接），输出GREEN/YELLOW/RED和发布建议。证据不完整则BLOCK。",
+      "startedAt": null,
+      "completedAt": null,
+      "output": "",
+      "logs": []
+    }
+  }
+}
