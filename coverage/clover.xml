@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1771468139652" clover="3.2.0">
+  <project timestamp="1771468139652" name="All files">
+    <metrics statements="29" coveredstatements="29" conditionals="25" coveredconditionals="24" methods="4" coveredmethods="4" elements="58" coveredelements="57" complexity="0" loc="29" ncloc="29" packages="1" files="1" classes="1"/>
+    <file name="stats-service.js" path="/Users/shengchun.sun/.openclaw/workspace/stats-service.js">
+      <metrics statements="29" coveredstatements="29" conditionals="25" coveredconditionals="24" methods="4" coveredmethods="4"/>
+      <line num="6" count="1" type="stmt"/>
+      <line num="13" count="5" type="stmt"/>
+      <line num="19" count="4" type="stmt"/>
+      <line num="25" count="4" type="stmt"/>
+      <line num="31" count="4" type="stmt"/>
+      <line num="36" count="4" type="stmt"/>
+      <line num="37" count="4" type="stmt"/>
+      <line num="38" count="4" type="stmt"/>
+      <line num="39" count="4" type="stmt"/>
+      <line num="41" count="4" type="stmt"/>
+      <line num="58" count="7" type="stmt"/>
+      <line num="63" count="7" type="stmt"/>
+      <line num="64" count="7" type="stmt"/>
+      <line num="65" count="7" type="stmt"/>
+      <line num="67" count="7" type="stmt"/>
+      <line num="68" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="69" count="8" type="stmt"/>
+      <line num="70" count="8" type="stmt"/>
+      <line num="71" count="8" type="stmt"/>
+      <line num="72" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="74" count="8" type="stmt"/>
+      <line num="75" count="8" type="stmt"/>
+      <line num="77" count="8" type="stmt"/>
+      <line num="89" count="7" type="stmt"/>
+      <line num="90" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="92" count="7" type="stmt"/>
+      <line num="107" count="2" type="stmt"/>
+      <line num="111" count="3" type="stmt"/>
+      <line num="119" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>

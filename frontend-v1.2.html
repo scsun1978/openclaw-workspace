@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock-SimGame v1.2 - 赛博交易终端</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050a14; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; }
+        .cyber-panel { background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); }
+        .neon-text-green { color: #10b981; text-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+        .neon-text-red { color: #ef4444; text-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+        .neon-text-gold { color: #fbbf24; text-shadow: 0 0 12px rgba(251, 191, 36, 0.6); }
+        .ticker-wrap { width: 100%; overflow: hidden; background: #0f172a; border-bottom: 1px solid #1e293b; padding: 5px 0; }
+        .ticker { display: inline-block; white-space: nowrap; animation: ticker 40s linear infinite; }
+        .ticker-item { display: inline-block; padding: 0 2rem; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .level-bar { height: 4px; background: #1e293b; border-radius: 2px; overflow: hidden; }
+        .level-progress { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.5s ease; }
+        .achievement-popup { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .achievement-glow { box-shadow: 0 0 30px rgba(251, 191, 36, 0.5), 0 0 60px rgba(251, 191, 36, 0.3); }
+        @keyframes shine { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+        .shine-effect { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); background-size: 200% 100%; animation: shine 2s infinite; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+    <!-- 成就弹窗 -->
+    <div id="achievement-popup" class="achievement-popup hidden">
+        <div class="cyber-panel achievement-glow p-6 rounded-2xl text-center animate__animated animate__bounceIn">
+            <div id="achievement-icon" class="text-6xl mb-3">🏆</div>
+            <div id="achievement-title" class="text-xl font-black text-yellow-400 mb-1">成就解锁！</div>
+            <div id="achievement-name" class="text-sm text-white mb-1">百万富翁</div>
+            <div id="achievement-desc" class="text-xs text-slate-400">总资产突破 ¥1,000,000</div>
+            <div class="mt-3 text-[10px] text-emerald-400">+500 XP</div>
+        </div>
+    </div>
+
+    <div class="ticker-wrap"><div id="price-ticker" class="ticker"><span class="ticker-item">CONNECTING...</span></div></div>
+    
+    <main class="flex-1 flex overflow-hidden p-4 gap-4">
+        <!-- 左侧 -->
+        <aside class="w-72 flex flex-col gap-4 overflow-hidden">
+            <!-- 身份认证 -->
+            <div id="auth-panel" class="cyber-panel p-4 rounded-xl flex flex-col gap-4">
+                <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-blue-400">Identity_Auth</h2>
+                <div id="login-form" class="flex flex-col gap-2">
+                    <input id="email" type="email" placeholder="EMAIL_ADDRESS" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs outline-none focus:border-blue-500">
+                    <input id="password" type="password" placeholder="ACCESS_KEY" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs outline-none focus:border-blue-500">
+                    <div class="flex gap-2">
+                        <button onclick="handleLogin()" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2 rounded text-[10px] font-black">LOGIN</button>
+                        <button onclick="handleRegister()" class="flex-1 border border-blue-900 text-blue-400 py-2 rounded text-[10px] font-black">REGISTER</button>
+                    </div>
+                </div>
+                <div id="user-info" class="hidden flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span id="username-display" class="text-sm font-bold text-white">PLAYER</span>
+                        <button onclick="showAchievements()" class="text-[9px] bg-yellow-900/50 text-yellow-400 px-2 py-0.5 rounded border border-yellow-800 hover:bg-yellow-800/50">🏆 成就</button>
+                    </div>
+                    <div class="level-bar"><div id="xp-progress" class="level-progress" style="width: 100%"></div></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-slate-950/50 p-2 rounded border border-slate-800">
+                            <div class="text-[9px] text-slate-500">CASH</div>
+                            <div id="balance-val" class="text-xs font-bold neon-text-green">¥0</div>
+                        </div>
+                        <div class="bg-slate-950/50 p-2 rounded border border-slate-800">
+                            <div class="text-[9px] text-slate-500">TOTAL</div>
+                            <div id="total-asset-val" class="text-xs font-bold text-white">¥0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 持仓 -->
+            <div class="h-1/4 cyber-panel p-4 rounded-xl flex flex-col overflow-hidden">
+                <h2 class="text-xs font-bold mb-3 flex items-center gap-2 text-emerald-400">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>MY_HOLDINGS
+                </h2>
+                <div id="holdings-list" class="flex-1 overflow-y-auto scroll-hide flex flex-col gap-1">
+                    <div class="text-slate-700 text-[10px] italic text-center mt-4">登录后查看持仓</div>
+                </div>
+            </div>
+            
+            <!-- 排行榜 -->
+            <div class="h-1/4 cyber-panel p-4 rounded-xl flex flex-col overflow-hidden">
+                <h2 class="text-xs font-bold mb-3 flex items-center gap-2 text-yellow-400">
+                    <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></span>LEADERBOARD
+                </h2>
+                <div id="leaderboard" class="flex-1 overflow-y-auto scroll-hide flex flex-col gap-2"></div>
+            </div>
+            
+            <!-- 新闻 -->
+            <div class="flex-1 cyber-panel p-4 rounded-xl flex flex-col overflow-hidden">
+                <h2 class="text-xs font-bold mb-3 flex items-center gap-2 text-rose-400">
+                    <span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span>MARKET_NEWS
+                </h2>
+                <div id="news-feed" class="flex-1 overflow-y-auto scroll-hide flex flex-col gap-3"></div>
+            </div>
+        </aside>
+        
+        <!-- 中间：图表 -->
+        <section class="flex-1 flex flex-col gap-4 overflow-hidden">
+            <div id="market-grid" class="grid grid-cols-5 gap-3"></div>
+            <div class="flex-1 cyber-panel rounded-xl p-4 flex flex-col relative">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span id="chart-symbol" class="text-3xl font-black text-white">AAPL</span>
+                        <span id="chart-price" class="text-xl ml-3 neon-text-green font-bold">---</span>
+                    </div>
+                    <div class="bg-blue-900/30 text-blue-400 text-[9px] px-2 py-1 rounded border border-blue-800">LIVE</div>
+                </div>
+                <div class="flex-1 min-h-0"><canvas id="mainChart"></canvas></div>
+            </div>
+            <div class="h-32 cyber-panel rounded-xl p-3 flex flex-col overflow-hidden">
+                <div class="text-[9px] font-bold text-slate-600 mb-1 uppercase tracking-[0.3em]">Terminal_Output</div>
+                <div id="system-logs" class="flex-1 overflow-y-auto font-mono text-[10px] text-slate-500 space-y-1 scroll-hide"></div>
+            </div>
+        </section>
+        
+        <!-- 右侧：交易 -->
+        <aside class="w-80 flex flex-col gap-4">
+            <div class="cyber-panel p-4 rounded-xl flex flex-col gap-4 border-r-4 border-emerald-500">
+                <h2 class="text-sm font-bold text-white uppercase tracking-widest">Market_Order</h2>
+                <div class="flex p-1 bg-slate-950 rounded-lg border border-slate-800">
+                    <button id="side-buy" onclick="setSide('BUY')" class="flex-1 py-1.5 rounded font-black text-[10px] bg-emerald-600 text-white">BUY</button>
+                    <button id="side-sell" onclick="setSide('SELL')" class="flex-1 py-1.5 rounded font-black text-[10px] text-slate-500">SELL</button>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] text-slate-500">QUANTITY</label>
+                        <input id="order-qty" type="number" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs outline-none focus:border-blue-500" placeholder="10">
+                    </div>
+                </div>
+                <button onclick="placeOrder()" class="w-full bg-white text-slate-950 font-black py-3 rounded-lg hover:bg-slate-200 transition-all active:scale-95">EXECUTE</button>
+            </div>
+            <div class="flex-1 cyber-panel p-4 rounded-xl flex flex-col overflow-hidden">
+                <h2 class="text-xs font-black mb-3 uppercase tracking-widest text-slate-400">Order_Book</h2>
+                <div id="order-book-display" class="flex-1 flex flex-col font-mono">
+                    <div id="book-sells" class="flex flex-col-reverse gap-0.5"></div>
+                    <div class="py-2 border-y border-slate-800/50 my-2 text-center text-[10px] text-slate-600">SPREAD: <span id="spread-val">0.00</span></div>
+                    <div id="book-buys" class="flex flex-col gap-0.5"></div>
+                </div>
+            </div>
+        </aside>
+    </main>
+    
+    <!-- 成就模态框 -->
+    <div id="achievement-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center">
+        <div class="cyber-panel p-6 rounded-2xl w-96 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-black text-yellow-400">🏆 成就殿堂</h3>
+                <button onclick="hideAchievements()" class="text-slate-500 hover:text-white text-xl">&times;</button>
+            </div>
+            <div id="achievements-grid" class="grid grid-cols-1 gap-2"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        const WS_BASE = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws';
+        let state = { token: localStorage.getItem('token'), activeSymbol: 'AAPL', side: 'BUY', prices: {}, history: {}, chart: null, holdings: [] };
+        
+        // 音效系统
+        const sounds = {
+            trade: () => { try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleAwAj+').play(); } catch(e) {} },
+            achievement: () => { try { const a = new AudioContext(); const o = a.createOscillator(); const g = a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value = 880; o.type = 'sine'; g.gain.setValueAtTime(0.3, a.currentTime); g.gain.exponentialRampToValueAtTime(0.01, a.currentTime + 0.5); o.start(); o.stop(a.currentTime + 0.5); } catch(e) {} }
+        };
+        
+        window.onload = () => { initChart(); startPolling(); if(state.token) fetchUserData(); connectWS(); };
+        
+        function addLog(msg, type='info') { 
+            const logs = document.getElementById('system-logs'); 
+            const div = document.createElement('div'); 
+            div.className = (type === 'error' ? 'text-red-500' : type === 'success' ? 'text-emerald-400' : ''); 
+            div.innerHTML = '[' + new Date().toLocaleTimeString() + '] ' + msg; 
+            logs.insertBefore(div, logs.firstChild); 
+        }
+        
+        async function handleLogin() { 
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            try { const res = await fetch(API_BASE + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e, password: p }) }); const json = await res.json(); if (json.success) { state.token = json.data.accessToken; localStorage.setItem('token', state.token); sounds.trade(); location.reload(); } else addLog('ERR: ' + json.error, 'error'); } catch(e) { addLog('ERR: CON_LOST', 'error'); }
+        }
+        
+        async function handleRegister() { 
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            try { const res = await fetch(API_BASE + '/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: e.split('@')[0], email: e, password: p }) }); const json = await res.json(); if (json.success) addLog('REG_OK: PLEASE_LOGIN', 'success'); else addLog('ERR: ' + json.error, 'error'); } catch(e) { addLog('ERR: CON_LOST', 'error'); }
+        }
+        
+        async function fetchUserData() { 
+            try { 
+                const res = await fetch(API_BASE + '/trading/account', { headers: { 'Authorization': 'Bearer ' + state.token } }); 
+                const json = await res.json(); 
+                if (json.success) { 
+                    state.user = json.data; 
+                    updateUI(); 
+                    document.getElementById('login-form').classList.add('hidden'); 
+                    document.getElementById('user-info').classList.remove('hidden'); 
+                    document.getElementById('username-display').textContent = state.user.username; 
+                    fetchHoldings();
+                } 
+            } catch(e) {}
+        }
+        
+        async function fetchHoldings() {
+            if (!state.token) return;
+            try {
+                const res = await fetch(API_BASE + '/trading/holdings', { headers: { 'Authorization': 'Bearer ' + state.token } });
+                const json = await res.json();
+                if (json.success) {
+                    state.holdings = json.data;
+                    updateHoldingsUI();
+                }
+            } catch(e) {}
+        }
+        
+        function updateHoldingsUI() {
+            const list = document.getElementById('holdings-list');
+            if (!state.holdings || state.holdings.length === 0) {
+                list.innerHTML = '<div class="text-slate-700 text-[10px] italic text-center mt-4">暂无持仓</div>';
+                return;
+            }
+            list.innerHTML = state.holdings.map(h => {
+                const price = state.prices[h.symbol] || 0;
+                const value = price * h.quantity;
+                return '<div class="flex justify-between items-center p-1.5 bg-slate-950/40 rounded text-[10px]">' +
+                    '<span class="text-slate-400">' + h.symbol + '</span>' +
+                    '<span class="text-white">' + h.quantity + '</span>' +
+                    '<span class="neon-text-green">¥' + value.toFixed(0) + '</span></div>';
+            }).join('');
+        }
+        
+        function startPolling() { 
+            setInterval(async () => { 
+                try { 
+                    const res = await fetch(API_BASE + '/market/prices'); 
+                    const json = await res.json(); 
+                    if (json.success) updatePrices(json.data); 
+                    updateLeaderboard(); 
+                } catch(e) {} 
+            }, 2000); 
+            setInterval(async () => { 
+                try { 
+                    const res = await fetch(API_BASE + '/news'); 
+                    const json = await res.json(); 
+                    if (json.success) updateNews(json.data); 
+                } catch(e) {} 
+            }, 5000); 
+        }
+        
+        function updatePrices(data) { 
+            const ticker = document.getElementById('price-ticker'), grid = document.getElementById('market-grid'); 
+            let th = '', gh = ''; 
+            for (const [s, p] of Object.entries(data)) { 
+                const op = state.prices[s] || p, diff = p - op, cls = diff > 0 ? 'neon-text-green' : diff < 0 ? 'neon-text-red' : 'text-slate-500'; 
+                th += '<span class="ticker-item">' + s + ' ' + p.toFixed(2) + '</span>'; 
+                gh += '<div onclick="selectSymbol(\'' + s + '\')" class="cyber-panel p-2 rounded cursor-pointer hover:scale-105 transition-all ' + (state.activeSymbol === s ? 'border-blue-500' : 'border-transparent') + '"><div class="text-[8px] text-slate-500">' + s + '</div><div class="text-xs font-bold ' + cls + '\">' + p.toFixed(2) + '</div></div>'; 
+                if (!state.history[s]) state.history[s] = []; state.history[s].push(p); if (state.history[s].length > 40) state.history[s].shift(); state.prices[s] = p; 
+            } 
+            ticker.innerHTML = th + th; grid.innerHTML = gh; 
+            if (data[state.activeSymbol]) { 
+                document.getElementById('chart-price').textContent = data[state.activeSymbol].toFixed(2); 
+                document.getElementById('chart-price').className = 'text-xl ml-3 font-bold ' + (state.prices[state.activeSymbol] >= (state.history[state.activeSymbol][state.history[state.activeSymbol].length-2]||0) ? 'neon-text-green' : 'neon-text-red'); 
+                updateChart(); 
+                updateOrderBook(); 
+                updateHoldingsUI();
+            } 
+        }
+        
+        function updateNews(newsList) {
+            const feed = document.getElementById('news-feed');
+            feed.innerHTML = newsList.map(news => {
+                const cls = news.type === 'positive' ? 'border-emerald-500' : news.type === 'negative' ? 'border-rose-500' : 'border-blue-500';
+                return '<div class="p-2 bg-slate-900/40 rounded border-l-2 ' + cls + ' animate__animated animate__fadeIn">' +
+                       '<div class="text-[8px] text-slate-500">' + new Date(news.timestamp).toLocaleTimeString() + ' · ' + news.symbol + '</div>' +
+                       '<div class="text-[10px] leading-tight">' + news.headline + '</div></div>';
+            }).join('');
+        }
+        
+        async function updateLeaderboard() { 
+            try { 
+                const res = await fetch(API_BASE + '/leaderboard'); 
+                const json = await res.json(); 
+                if (json.success) { 
+                    document.getElementById('leaderboard').innerHTML = json.data.map((u, i) => '<div class="flex items-center gap-2 p-1.5 bg-slate-950/40 rounded border border-slate-900"><span class="text-[10px] italic ' + (i < 3 ? 'neon-text-gold' : 'text-slate-700') + '">#' + (i+1) + '</span><span class="flex-1 text-[10px] truncate">' + u.username + '</span><span class="text-[10px] font-bold text-blue-500">¥' + (parseFloat(u.total_asset)/1000).toFixed(1) + 'k</span></div>').join(''); 
+                } 
+            } catch(e) {} 
+        }
+        
+        async function updateOrderBook() { 
+            try { 
+                const res = await fetch(API_BASE + '/market/orderbook/' + state.activeSymbol); 
+                const json = await res.json(); 
+                if (json.success) { 
+                    const { buys, sells } = json.data; 
+                    document.getElementById('book-sells').innerHTML = (sells.slice(0, 5).map(o => '<div class="flex justify-between text-[9px] py-0.5 px-2 hover:bg-red-500/10"><span class="text-rose-500">' + parseFloat(o.price).toFixed(2) + '</span><span class="text-slate-500">' + o.quantity + '</span></div>').join('')) || '<div class="text-[9px] text-center text-slate-800 italic">NO_ASKS</div>'; 
+                    document.getElementById('book-buys').innerHTML = (buys.slice(0, 5).map(o => '<div class="flex justify-between text-[9px] py-0.5 px-2 hover:bg-emerald-500/10"><span class="text-emerald-500">' + parseFloat(o.price).toFixed(2) + '</span><span class="text-slate-500">' + o.quantity + '</span></div>').join('')) || '<div class="text-[9px] text-center text-slate-800 italic">NO_BIDS</div>'; 
+                    if(buys[0] && sells[0]) document.getElementById('spread-val').textContent = (sells[0].price - buys[0].price).toFixed(2); 
+                } 
+            } catch(e) {} 
+        }
+        
+        function updateUI() { 
+            if (!state.user) return; 
+            document.getElementById('balance-val').textContent = '¥' + (parseFloat(state.user.balance)/1000).toFixed(1) + 'k'; 
+            document.getElementById('total-asset-val').textContent = '¥' + (parseFloat(state.user.total_asset)/1000).toFixed(1) + 'k'; 
+            document.getElementById('xp-progress').style.width = Math.min((state.user.total_asset / 1000000) * 100, 100) + '%'; 
+        }
+        
+        function selectSymbol(s) { state.activeSymbol = s; document.getElementById('chart-symbol').textContent = s; updateOrderBook(); }
+        function setSide(s) { 
+            state.side = s; 
+            document.getElementById('side-buy').className = s === 'BUY' ? 'flex-1 py-1.5 rounded font-black text-[10px] bg-emerald-600 text-white' : 'flex-1 py-1.5 rounded font-black text-[10px] text-slate-500'; 
+            document.getElementById('side-sell').className = s === 'SELL' ? 'flex-1 py-1.5 rounded font-black text-[10px] bg-rose-600 text-white' : 'flex-1 py-1.5 rounded font-black text-[10px] text-slate-500'; 
+        }
+        
+        async function placeOrder() {
+            if (!state.token) return addLog('ERR: LOGIN_REQUIRED', 'error');
+            const q = parseInt(document.getElementById('order-qty').value);
+            try { 
+                const res = await fetch(API_BASE + '/orders', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.token }, body: JSON.stringify({ symbol: state.activeSymbol, side: state.side, type: 'MARKET', quantity: q }) }); 
+                const json = await res.json(); 
+                if (json.success) { 
+                    sounds.trade();
+                    addLog('OK: ' + state.side + ' ' + q + ' ' + state.activeSymbol, 'success'); 
+                    fetchUserData(); 
+                    fetchHoldings();
+                } else addLog('ERR: ' + json.error, 'error');
+            } catch(e) { addLog('ERR: EXEC_FAIL', 'error'); }
+        }
+        
+        async function showAchievements() {
+            if (!state.token) return;
+            try {
+                const res = await fetch(API_BASE + '/achievements', { headers: { 'Authorization': 'Bearer ' + state.token } });
+                const json = await res.json();
+                if (json.success) {
+                    const grid = document.getElementById('achievements-grid');
+                    grid.innerHTML = json.data.map(a => {
+                        const unlocked = a.unlocked_at;
+                        return '<div class="p-3 rounded-lg ' + (unlocked ? 'bg-yellow-900/20 border border-yellow-700' : 'bg-slate-900/50 border border-slate-800 opacity-50') + '">' +
+                            '<div class="flex items-center gap-2">' +
+                            '<span class="text-2xl">' + a.icon + '</span>' +
+                            '<div class="flex-1">' +
+                            '<div class="text-xs font-bold ' + (unlocked ? 'text-yellow-400' : 'text-slate-500') + '">' + a.name + '</div>' +
+                            '<div class="text-[10px] text-slate-500">' + a.description + '</div>' +
+                            '</div>' +
+                            '<div class="text-[9px] text-emerald-400">+' + a.xp_reward + ' XP</div>' +
+                            '</div></div>';
+                    }).join('');
+                    document.getElementById('achievement-modal').classList.remove('hidden');
+                }
+            } catch(e) {}
+        }
+        
+        function hideAchievements() {
+            document.getElementById('achievement-modal').classList.add('hidden');
+        }
+        
+        function showAchievementPopup(achievement) {
+            sounds.achievement();
+            document.getElementById('achievement-icon').textContent = achievement.icon;
+            document.getElementById('achievement-name').textContent = achievement.name;
+            document.getElementById('achievement-desc').textContent = achievement.description;
+            const popup = document.getElementById('achievement-popup');
+            popup.classList.remove('hidden');
+            setTimeout(() => popup.classList.add('hidden'), 4000);
+        }
+        
+        function connectWS() { 
+            const ws = new WebSocket(WS_BASE + (state.token ? '?userId=' + state.user?.id : '')); 
+            ws.onopen = () => addLog('STREAM_READY'); 
+            ws.onmessage = (e) => { 
+                const msg = JSON.parse(e.data); 
+                if (msg.type === 'ORDER_UPDATE') { 
+                    sounds.trade();
+                    addLog('MATCH: ' + msg.data.symbol, 'success'); 
+                    fetchUserData(); 
+                    fetchHoldings();
+                } 
+                if (msg.type === 'MARKET_NEWS') { 
+                    updateNews([msg.data]); 
+                } 
+                if (msg.type === 'ACHIEVEMENT_UNLOCKED') {
+                    showAchievementPopup(msg.data.achievement);
+                }
+            }; 
+            ws.onclose = () => setTimeout(connectWS, 5000); 
+        }
+        
+        function initChart() { 
+            const ctx = document.getElementById('mainChart').getContext('2d'); 
+            state.chart = new Chart(ctx, { 
+                type: 'line', 
+                data: { labels: Array(40).fill(''), datasets: [{ data: [], borderColor: '#3b82f6', borderWidth: 1.5, pointRadius: 0, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.05)', tension: 0.4 }] }, 
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: false }, y: { grid: { color: '#0f172a' }, ticks: { color: '#334155', font: { size: 8 } } } }, plugins: { legend: { display: false } }, animation: { duration: 0 } } 
+            }); 
+        }
+        
+        function updateChart() { 
+            const data = state.history[state.activeSymbol] || []; 
+            state.chart.data.datasets[0].data = data; 
+            state.chart.data.labels = data.map((_, i) => i); 
+            if (data.length > 1) { 
+                const up = data[data.length-1] >= data[data.length-2]; 
+                state.chart.data.datasets[0].borderColor = up ? '#10b981' : '#ef4444'; 
+                state.chart.data.datasets[0].backgroundColor = up ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)'; 
+            } 
+            state.chart.update(); 
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@
   "name": "login-feature",
   "goal": "实现用户登录功能，包括代码、测试和文档",
   "mode": "linear",
-  "status": "active",
+  "status": "completed",
   "created_at": "2026-02-17T13:35:00",
   "stages": {
     "code-agent": {

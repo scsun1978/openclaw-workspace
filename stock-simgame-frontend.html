@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock-SimGame Live v1.0 - 赛博交易终端</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050a14;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .cyber-panel {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #1e293b;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        .neon-border-green { border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+        .neon-border-red { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        .neon-text-green { color: #10b981; text-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+        .neon-text-red { color: #ef4444; text-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+        .neon-text-blue { color: #3b82f6; text-shadow: 0 0 8px rgba(59, 130, 246, 0.5); }
+        
+        .ticker-wrap { width: 100%; overflow: hidden; background: #0f172a; border-bottom: 1px solid #1e293b; padding: 5px 0; }
+        .ticker { display: inline-block; white-space: nowrap; animation: ticker 30s linear infinite; }
+        .ticker-item { display: inline-block; padding: 0 2rem; }
+        
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .price-up { animation: flashGreen 1s ease-out; }
+        .price-down { animation: flashRed 1s ease-out; }
+        @keyframes flashGreen { 0% { background: rgba(16, 185, 129, 0.3); } 100% { background: transparent; } }
+        @keyframes flashRed { 0% { background: rgba(239, 68, 68, 0.3); } 100% { background: transparent; } }
+        
+        .level-bar { height: 4px; background: #1e293b; border-radius: 2px; overflow: hidden; }
+        .level-progress { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.5s ease; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- 顶部滚动行情 -->
+    <div class="ticker-wrap">
+        <div id="price-ticker" class="ticker">
+            <span class="ticker-item">载入行情中...</span>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <main class="flex-1 flex overflow-hidden p-4 gap-4">
+        
+        <!-- 左侧：个人资产 & 排行榜 -->
+        <aside class="w-1/4 flex flex-col gap-4">
+            <!-- 个人卡片 -->
+            <div id="auth-panel" class="cyber-panel p-4 rounded-lg flex flex-col gap-4">
+                <h2 class="text-xl font-bold neon-text-blue">身份认证</h2>
+                <div id="login-form" class="flex flex-col gap-2">
+                    <input id="email" type="email" placeholder="Email" class="bg-slate-900 border border-slate-700 p-2 rounded focus:border-blue-500 outline-none">
+                    <input id="password" type="password" placeholder="Password" class="bg-slate-900 border border-slate-700 p-2 rounded focus:border-blue-500 outline-none">
+                    <div class="flex gap-2">
+                        <button onclick="handleLogin()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold transition">登录</button>
+                        <button onclick="handleRegister()" class="flex-1 border border-blue-600 text-blue-400 hover:bg-blue-900 p-2 rounded font-bold transition">注册</button>
+                    </div>
+                </div>
+                <div id="user-info" class="hidden flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span id="username-display" class="text-lg font-bold">Player</span>
+                        <span class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded">Rank: #--</span>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 mb-1">XP / 资产规模</div>
+                        <div class="level-bar">
+                            <div id="xp-progress" class="level-progress" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                            <div class="text-[10px] text-slate-500 uppercase">可用余额</div>
+                            <div id="balance-val" class="text-sm font-bold neon-text-green">¥100,000</div>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                            <div class="text-[10px] text-slate-500 uppercase">总资产</div>
+                            <div id="total-asset-val" class="text-sm font-bold text-white">¥100,000</div>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" class="text-[10px] text-slate-500 hover:text-red-400 text-right uppercase">Logout_Terminal</button>
+                </div>
+            </div>
+
+            <!-- 排行榜 -->
+            <div class="flex-1 cyber-panel p-4 rounded-lg flex flex-col overflow-hidden">
+                <h2 class="text-sm font-bold mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                    全服排行榜 (LEADERBOARD)
+                </h2>
+                <div id="leaderboard" class="flex-1 overflow-y-auto scroll-hide flex flex-col gap-2">
+                    <div class="text-slate-600 text-xs text-center mt-10 italic">载入竞技数据中...</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 中间：主图表 & 市场 -->
+        <section class="flex-1 flex flex-col gap-4 overflow-hidden">
+            <!-- 实时价格矩阵 -->
+            <div id="market-grid" class="grid grid-cols-5 gap-4">
+                <!-- Stock Cards will be here -->
+            </div>
+
+            <!-- 动态图表面板 -->
+            <div class="flex-1 cyber-panel rounded-lg p-4 flex flex-col relative">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <span id="chart-symbol" class="text-2xl font-bold mr-2 text-white">AAPL</span>
+                        <span id="chart-price" class="text-xl neon-text-green font-bold">150.23</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="bg-slate-800 px-3 py-1 rounded text-xs hover:bg-slate-700">1M</button>
+                        <button class="bg-blue-900 px-3 py-1 rounded text-xs border border-blue-500">LIVE</button>
+                    </div>
+                </div>
+                <div class="flex-1 min-h-0">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 交易日志 -->
+            <div class="h-1/4 cyber-panel rounded-lg p-4 flex flex-col overflow-hidden">
+                <div class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">系统交互记录 (SYSTEM_LOG)</div>
+                <div id="system-logs" class="flex-1 overflow-y-auto font-mono text-[10px] text-slate-400">
+                    <div>[SYSTEM] 终端初始化完成...</div>
+                    <div>[SYSTEM] 连接至生产服务器 172.16.100.101:3005...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧：下单 & 订单簿 -->
+        <aside class="w-1/4 flex flex-col gap-4">
+            <!-- 交易面板 -->
+            <div class="cyber-panel p-4 rounded-lg flex flex-col gap-4 border-t-2 border-blue-500">
+                <h2 class="text-lg font-bold text-white flex justify-between">
+                    执行交易 
+                    <span id="active-symbol" class="text-blue-400">AAPL</span>
+                </h2>
+                
+                <div class="flex p-1 bg-slate-900 rounded">
+                    <button id="side-buy" onclick="setSide('BUY')" class="flex-1 py-2 rounded font-bold text-sm bg-emerald-600 text-white shadow-lg shadow-emerald-900/20">买入</button>
+                    <button id="side-sell" onclick="setSide('SELL')" class="flex-1 py-2 rounded font-bold text-sm text-slate-400 hover:text-white transition">卖出</button>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-500 uppercase">订单类型</label>
+                        <select id="order-type" onchange="togglePriceInput()" class="bg-slate-800 border border-slate-700 p-2 rounded text-sm outline-none">
+                            <option value="MARKET">市价单 (Market)</option>
+                            <option value="LIMIT">限价单 (Limit)</option>
+                        </select>
+                    </div>
+                    <div id="price-input-container" class="hidden flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-500 uppercase">委托价格</label>
+                        <input id="order-price" type="number" step="0.01" class="bg-slate-800 border border-slate-700 p-2 rounded text-sm outline-none" placeholder="0.00">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] text-slate-500 uppercase">交易数量</label>
+                        <input id="order-qty" type="number" class="bg-slate-800 border border-slate-700 p-2 rounded text-sm outline-none" placeholder="10">
+                    </div>
+                </div>
+
+                <button onclick="placeOrder()" class="w-full bg-slate-100 text-slate-900 font-black py-3 rounded-lg hover:bg-white active:scale-95 transition-all">
+                    确 认 下 单
+                </button>
+            </div>
+
+            <!-- 实时订单簿 -->
+            <div class="flex-1 cyber-panel p-4 rounded-lg flex flex-col overflow-hidden">
+                <h2 class="text-sm font-bold mb-3 uppercase tracking-tighter">订单簿 (ORDER_BOOK)</h2>
+                <div class="flex-1 flex flex-col">
+                    <!-- Sells (Asks) -->
+                    <div id="book-sells" class="flex flex-col-reverse">
+                        <!-- Sell orders go here -->
+                    </div>
+                    <!-- Spread -->
+                    <div class="py-2 border-y border-slate-800 my-2 text-center text-xs text-slate-500">
+                        SPREAD: <span id="spread-val">0.00</span>
+                    </div>
+                    <!-- Buys (Bids) -->
+                    <div id="book-buys" class="flex flex-col">
+                        <!-- Buy orders go here -->
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <script>
+        const API_BASE = 'http://172.16.100.101:3005';
+        const WS_BASE = 'ws://172.16.100.101:3005';
+        
+        let state = {
+            token: localStorage.getItem('simgame_token'),
+            user: null,
+            activeSymbol: 'AAPL',
+            side: 'BUY',
+            prices: {},
+            history: {}, // { AAPL: [price1, price2, ...] }
+            chart: null
+        };
+
+        // --- 初始化 ---
+        window.onload = async () => {
+            initChart();
+            startPricePolling();
+            updateLeaderboard();
+            if (state.token) {
+                await fetchUserData();
+            }
+            connectWS();
+        };
+
+        function addLog(msg, type = 'info') {
+            const logs = document.getElementById('system-logs');
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            div.className = `animate__animated animate__fadeInLeft ${type === 'error' ? 'text-red-400' : type === 'success' ? 'text-green-400' : ''}`;
+            div.textContent = `[${time}] ${msg}`;
+            logs.insertBefore(div, logs.firstChild);
+        }
+
+        // --- 认证 ---
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    state.token = json.data.accessToken;
+                    localStorage.setItem('simgame_token', state.token);
+                    await fetchUserData();
+                    addLog('登录成功，终端已激活', 'success');
+                } else {
+                    addLog(`登录失败: ${json.error}`, 'error');
+                }
+            } catch (e) {
+                addLog('服务器连接失败', 'error');
+            }
+        }
+
+        async function handleRegister() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = email.split('@')[0];
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    addLog('注册成功，请登录', 'success');
+                } else {
+                    addLog(`注册失败: ${json.error}`, 'error');
+                }
+            } catch (e) {
+                addLog('注册连接失败', 'error');
+            }
+        }
+
+        async function fetchUserData() {
+            try {
+                const res = await fetch(`${API_BASE}/api/trading/account`, {
+                    headers: { 'Authorization': `Bearer ${state.token}` }
+                });
+                const json = await res.json();
+                if (json.success) {
+                    state.user = json.data;
+                    updateUI();
+                    document.getElementById('auth-panel').classList.add('neon-border-green');
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('user-info').classList.remove('hidden');
+                    document.getElementById('username-display').textContent = state.user.username;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('simgame_token');
+            location.reload();
+        }
+
+        // --- 交易 ---
+        function setSide(side) {
+            state.side = side;
+            const buyBtn = document.getElementById('side-buy');
+            const sellBtn = document.getElementById('side-sell');
+            if (side === 'BUY') {
+                buyBtn.className = 'flex-1 py-2 rounded font-bold text-sm bg-emerald-600 text-white shadow-lg';
+                sellBtn.className = 'flex-1 py-2 rounded font-bold text-sm text-slate-400';
+            } else {
+                sellBtn.className = 'flex-1 py-2 rounded font-bold text-sm bg-rose-600 text-white shadow-lg';
+                buyBtn.className = 'flex-1 py-2 rounded font-bold text-sm text-slate-400';
+            }
+        }
+
+        function togglePriceInput() {
+            const type = document.getElementById('order-type').value;
+            document.getElementById('price-input-container').className = type === 'LIMIT' ? 'flex flex-col gap-1' : 'hidden';
+        }
+
+        async function placeOrder() {
+            if (!state.token) return addLog('请先登录', 'error');
+            
+            const type = document.getElementById('order-type').value;
+            const quantity = parseInt(document.getElementById('order-qty').value);
+            const price = parseFloat(document.getElementById('order-price').value);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/orders`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${state.token}`
+                    },
+                    body: JSON.stringify({
+                        symbol: state.activeSymbol,
+                        side: state.side,
+                        type: type,
+                        quantity: quantity,
+                        price: type === 'LIMIT' ? price : null
+                    })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    addLog(`订单已提交: ${state.side} ${quantity} ${state.activeSymbol}`, 'success');
+                    fetchUserData(); // 刷新资产
+                } else {
+                    addLog(`下单失败: ${json.error}`, 'error');
+                }
+            } catch (e) {
+                addLog('网络异常', 'error');
+            }
+        }
+
+        // --- 市场 & UI ---
+        function startPricePolling() {
+            setInterval(async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/api/market/prices`);
+                    const json = await res.json();
+                    if (json.success) {
+                        updatePrices(json.data);
+                    }
+                    updateLeaderboard();
+                } catch (e) {}
+            }, 3000);
+        }
+
+        function updatePrices(data) {
+            const ticker = document.getElementById('price-ticker');
+            const grid = document.getElementById('market-grid');
+            let tickerHtml = '';
+            let gridHtml = '';
+
+            for (const [symbol, price] of Object.entries(data)) {
+                const oldPrice = state.prices[symbol] || price;
+                const change = price - oldPrice;
+                const colorClass = change > 0 ? 'neon-text-green' : change < 0 ? 'neon-text-red' : 'text-slate-400';
+                const arrow = change > 0 ? '▲' : change < 0 ? '▼' : '';
+
+                tickerHtml += `<span class="ticker-item font-bold">${symbol}: <span class="${colorClass}">${price.toFixed(2)} ${arrow}</span></span>`;
+                
+                gridHtml += `
+                    <div onclick="selectSymbol('${symbol}')" class="cyber-panel p-3 rounded-lg cursor-pointer hover:border-blue-500 transition-all ${state.activeSymbol === symbol ? 'ring-2 ring-blue-500' : ''}">
+                        <div class="text-[10px] text-slate-500">${symbol}</div>
+                        <div class="text-lg font-black ${colorClass}">${price.toFixed(2)}</div>
+                    </div>
+                `;
+
+                // 历史记录
+                if (!state.history[symbol]) state.history[symbol] = [];
+                state.history[symbol].push(price);
+                if (state.history[symbol].length > 20) state.history[symbol].shift();
+
+                state.prices[symbol] = price;
+            }
+            
+            ticker.innerHTML = tickerHtml + tickerHtml; // Double for seamless loop
+            grid.innerHTML = gridHtml;
+
+            // 更新当前图表数据
+            if (data[state.activeSymbol]) {
+                document.getElementById('chart-price').textContent = data[state.activeSymbol].toFixed(2);
+                document.getElementById('chart-price').className = 'text-xl font-bold ' + (state.prices[state.activeSymbol] > state.prices[state.activeSymbol] ? 'neon-text-green' : 'neon-text-red');
+                updateChart();
+                updateOrderBook();
+            }
+        }
+
+        async function updateLeaderboard() {
+            try {
+                const res = await fetch(`${API_BASE}/api/leaderboard`);
+                const json = await res.json();
+                if (json.success) {
+                    const lb = document.getElementById('leaderboard');
+                    lb.innerHTML = json.data.map((u, i) => `
+                        <div class="flex items-center gap-3 p-2 bg-slate-900/50 rounded border border-slate-800">
+                            <span class="text-xs font-bold ${i < 3 ? 'text-yellow-500' : 'text-slate-500'}">0${i+1}</span>
+                            <span class="flex-1 text-xs truncate">${u.username}</span>
+                            <span class="text-xs font-bold neon-text-blue">¥${Math.floor(u.total_asset/1000)}k</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {}
+        }
+
+        async function updateOrderBook() {
+            try {
+                const res = await fetch(`${API_BASE}/api/market/orderbook/${state.activeSymbol}`);
+                const json = await res.json();
+                if (json.success) {
+                    const { buys, sells } = json.data;
+                    
+                    const sellHtml = sells.slice(0, 5).map(o => `
+                        <div class="flex justify-between text-[10px] py-1 px-2 hover:bg-rose-900/20 transition">
+                            <span class="neon-text-red">${parseFloat(o.price).toFixed(2)}</span>
+                            <span class="text-slate-300">${o.quantity}</span>
+                        </div>
+                    `).join('');
+                    
+                    const buyHtml = buys.slice(0, 5).map(o => `
+                        <div class="flex justify-between text-[10px] py-1 px-2 hover:bg-emerald-900/20 transition">
+                            <span class="neon-text-green">${parseFloat(o.price).toFixed(2)}</span>
+                            <span class="text-slate-300">${o.quantity}</span>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('book-sells').innerHTML = sellHtml || '<div class="text-[10px] text-center text-slate-700">暂无卖单</div>';
+                    document.getElementById('book-buys').innerHTML = buyHtml || '<div class="text-[10px] text-center text-slate-700">暂无买单</div>';
+                    
+                    if (buys[0] && sells[0]) {
+                        const spread = parseFloat(sells[0].price) - parseFloat(buys[0].price);
+                        document.getElementById('spread-val').textContent = spread.toFixed(2);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function updateUI() {
+            if (!state.user) return;
+            document.getElementById('balance-val').textContent = `¥${parseFloat(state.user.balance).toLocaleString()}`;
+            document.getElementById('total-asset-val').textContent = `¥${parseFloat(state.user.total_asset).toLocaleString()}`;
+            
+            // 计算 XP 进度 (假设 1M 是满级)
+            const progress = Math.min((state.user.total_asset / 1000000) * 100, 100);
+            document.getElementById('xp-progress').style.width = `${progress}%`;
+        }
+
+        function selectSymbol(sym) {
+            state.activeSymbol = sym;
+            document.getElementById('chart-symbol').textContent = sym;
+            document.getElementById('active-symbol').textContent = sym;
+            updateUI();
+            updateOrderBook();
+        }
+
+        // --- WebSocket ---
+        function connectWS() {
+            const ws = new WebSocket(`${WS_BASE}${state.token ? '?userId=' + state.user?.id : ''}`);
+            ws.onopen = () => addLog('实时通信链路已加密建立', 'info');
+            ws.onmessage = (e) => {
+                const msg = JSON.parse(e.data);
+                if (msg.type === 'ORDER_UPDATE') {
+                    addLog(`成交提醒: ${msg.data.symbol} 已成交`, 'success');
+                    fetchUserData();
+                }
+                if (msg.type === 'MARKET_DATA') {
+                    // 处理实时价格推送
+                }
+            };
+            ws.onclose = () => setTimeout(connectWS, 5000);
+        }
+
+        // --- 图表 ---
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            state.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(20).fill(''),
+                    datasets: [{
+                        label: 'Price',
+                        data: [],
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#475569', font: { size: 10 } }
+                        }
+                    },
+                    plugins: { legend: { display: false } },
+                    animation: { duration: 400 }
+                }
+            });
+        }
+
+        function updateChart() {
+            const data = state.history[state.activeSymbol] || [];
+            state.chart.data.datasets[0].data = data;
+            state.chart.data.labels = data.map((_, i) => i);
+            
+            // 颜色随涨跌变化
+            if (data.length > 1) {
+                const up = data[data.length-1] >= data[data.length-2];
+                state.chart.data.datasets[0].borderColor = up ? '#10b981' : '#ef4444';
+                state.chart.data.datasets[0].backgroundColor = up ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+            }
+            
+            state.chart.update('none');
+        }
+    </script>
+</body>
+</html>

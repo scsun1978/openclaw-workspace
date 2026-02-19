@@ -1,0 +1,90 @@
+{
+  "project": "stock-simgame-live-w3",
+  "goal": "执行 LIVE 目标 W3：稳定性与故障恢复（WS降级+重连+故障注入+监控完善）",
+  "created": "2026-02-18T05:20:09.176438+00:00",
+  "updated": "2026-02-18T06:29:37.546066+00:00",
+  "status": "completed",
+  "mode": "linear",
+  "workspace": "",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": null,
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "done",
+      "task": "W3代码落地：1) WebSocket降级到HTTP轮询；2) 断线重连机制；3) 心跳检测；4) 修复W2撮合引擎遗留问题（8个测试）；5) 提升覆盖率到85%。必须回传commit_sha与测试结果。",
+      "startedAt": "2026-02-18T05:20:09.437297+00:00",
+      "completedAt": "2026-02-18T05:46:10.351055+00:00",
+      "output": "W3 Code完成：commit=08f7faf5；实现WS降级轮询、指数退避重连、30s心跳检测及Redis事件缓冲；修复了撮合引擎遗留问题。覆盖率预期85%+。",
+      "logs": [
+        {
+          "time": "2026-02-18T05:20:09.437478+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T05:46:10.352156+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "done",
+      "task": "W3质量落地：1) 故障注入测试（网络中断/DB断连/Redis失效）；2) 恢复路径验证；3) 并发压测（目标≥200 TPS）；4) 修复W2遗留测试；5) 输出W3 PASS/BLOCK结论。",
+      "startedAt": "2026-02-18T05:46:10.400451+00:00",
+      "completedAt": "2026-02-18T06:07:08.383796+00:00",
+      "output": "QA回传：W3测试脚手架已完成。新增20个故障注入用例（WS断线/DB断连/Redis失效/心跳超时/指数退避等），总计77个用例；压测目标200TPS。结论：CONDITIONAL PASS（脚手架就绪，Docker环境受限）。",
+      "logs": [
+        {
+          "time": "2026-02-18T05:46:10.400660+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T06:07:08.383963+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "done",
+      "task": "W3文档落地：1) 故障排查手册（TROUBLESHOOTING.md）；2) 监控指标说明；3) 值班SOP；4) 更新运维Runbook。必须回传commit_sha。",
+      "startedAt": "2026-02-18T06:07:08.426474+00:00",
+      "completedAt": "2026-02-18T06:16:49.918849+00:00",
+      "output": "Docs回传：commit=0326a9be；新增3文档+1更新共1899行——TROUBLESHOOTING.md(646行)、MONITORING-GUIDE.md(532行)、ONCALL-SOP.md(545行)、OPS-RUNBOOK.md(+182行)。",
+      "logs": [
+        {
+          "time": "2026-02-18T06:07:08.426623+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T06:16:49.919026+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "done",
+      "task": "W3治理落地：1) 周三中期检查；2) 跟踪W1/W2技术债务清零；3) W3 Gate Review；4) 汇总证据给出结论。",
+      "startedAt": "2026-02-18T06:16:49.962183+00:00",
+      "completedAt": "2026-02-18T06:29:37.545888+00:00",
+      "output": "Monitor Gate结论：NO-GO (RED) -> 进入修复周。W3产物（WS降级/故障注入用例/SOP）已交付，但因Docker环境缺口导致实测置信度为零。债务三周堆叠，禁止进入W4。下周强制转为W4a修复周，核心目标：1)解决环境问题；2)债务清零(W1-W3回归+20个故障注入)；3)实测覆盖率≥85%；4)SOP演练。",
+      "logs": [
+        {
+          "time": "2026-02-18T06:16:49.962403+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T06:29:37.546058+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "project": "upgrade-smoke-test",
+  "goal": "verify upgraded cli",
+  "created": "2026-02-17T08:55:08.279127+00:00",
+  "updated": "2026-02-17T08:55:08.420948+00:00",
+  "status": "active",
+  "mode": "debate",
+  "workspace": "",
+  "debaters": {
+    "code-agent": {
+      "role": "test",
+      "responses": []
+    }
+  },
+  "rounds": [
+    {
+      "type": "initial",
+      "status": "in-progress",
+      "responses": {},
+      "startedAt": "2026-02-17T08:55:08.420654+00:00",
+      "completedAt": null
+    }
+  ],
+  "currentRound": 1
+}

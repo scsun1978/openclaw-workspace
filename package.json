@@ -1,0 +1,22 @@
+{
+  "name": "stock-simgame-live",
+  "version": "1.2.0-w5",
+  "description": "股票模拟游戏 - 盈亏分析与交易统计",
+  "scripts": {
+    "test": "jest --coverage --verbose",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "stats-service.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "project": "stock-simgame-roadmap",
+  "goal": "将 roadmap 作为接下来主计划，完成实施拆解、里程碑、验收标准与执行节奏",
+  "created": "2026-02-18T00:58:55.079495+00:00",
+  "updated": "2026-02-18T01:56:28.569761+00:00",
+  "status": "completed",
+  "mode": "linear",
+  "workspace": "",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": null,
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "done",
+      "task": "制定技术实施路线（12周）：按 v1.1 稳定性、v1.2 功能增强、v1.5 架构演进拆解为周级任务。输出：里程碑、模块依赖、风险、每周交付物、每项DoD（Definition of Done）。必须包含环境闭环（Docker qa-smoke、migration rollback、监控指标）。",
+      "startedAt": "2026-02-18T00:58:55.442696+00:00",
+      "completedAt": "2026-02-18T01:16:17.176913+00:00",
+      "output": "Code最终回传：commit=fcc8f8d00b713653a70d8fdf4d8f011d462d2d3a；ROADMAP.md(782行) 已完成。12周拆分：v1.1(W1-4)/v1.2(W5-8)/v1.5(W9-12)，含48任务、4里程碑、4关键风险、6项上线闭环、DoD与成功指标。文件路径：/Users/shengchun.sun/.openclaw/workspace-scsun-code-agent/ROADMAP.md",
+      "logs": [
+        {
+          "time": "2026-02-18T00:58:55.442969+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T01:16:17.177195+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "done",
+      "task": "制定QA执行计划：测试策略（单元/集成/E2E/回归/性能/故障注入）、覆盖率目标、质量闸门、版本发布准入标准（PASS/BLOCK条件）、测试环境矩阵。输出可执行测试日历与每周验收清单。",
+      "startedAt": "2026-02-18T01:16:17.249352+00:00",
+      "completedAt": "2026-02-18T01:22:40.103414+00:00",
+      "output": "QA回传：已完成《QA-EXECUTION-PLAN-STOCK-SIMGAME.md》。包含测试策略（单元/集成/E2E/性能/故障注入）、覆盖率目标（总体90%）、版本质量闸门（v1.1/v1.2/v1.5）、发布准入标准、环境矩阵与W1-W12每周验收清单。总用例目标：v1.1 185+ / v1.2 260+ / v1.5 400+。",
+      "logs": [
+        {
+          "time": "2026-02-18T01:16:17.249589+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T01:22:40.103584+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "done",
+      "task": "制定文档与发布运营计划：README/Runbook/API/Release Notes更新节奏，发布流程（灰度/回滚/SRE值守），知识库结构。输出模板清单与每周文档任务，确保与代码提交commit关联。",
+      "startedAt": "2026-02-18T01:22:40.149976+00:00",
+      "completedAt": "2026-02-18T01:44:33.148058+00:00",
+      "output": "Docs回传：commit=6876c5563e27a25bafaef297737b28cfe6695479；DOCS-ROADMAP.md(810行)已完成。W1-W12文档节奏、灰度发布流程（5%→100%）、回滚/值守/冻结策略、3类模板、任务关联机制全部覆盖。",
+      "logs": [
+        {
+          "time": "2026-02-18T01:22:40.150139+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T01:44:33.148224+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "done",
+      "task": "制定治理与推进机制：每周review节奏、风险看板、阻塞升级路径、度量指标（交付率/缺陷密度/MTTR/变更失败率）。输出最终综合Roadmap计划并给出执行建议。",
+      "startedAt": "2026-02-18T01:44:33.194311+00:00",
+      "completedAt": "2026-02-18T01:56:28.569573+00:00",
+      "output": "Monitor回执：已完成《ROADMAP-v1-governance.md》，commit=9752459。包含：1) W1-W12每周评审节奏（周一Plan/周三Check/周五Gate）；2) 风险看板分级机制；3) 核心KPI指标（交付率/缺陷密度/MTTR/变更失败率）；4) 阻塞升级红线；5) 最终ROADMAP v1执行准则。建议按“双闸机制”执行。",
+      "logs": [
+        {
+          "time": "2026-02-18T01:44:33.194471+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T01:56:28.569754+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    }
+  }
+}

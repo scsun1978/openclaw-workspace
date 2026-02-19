@@ -1,0 +1,91 @@
+{
+  "project": "stock-simgame-live-goal",
+  "goal": "在服务器上运行可真实游玩的 stock-simgame，并形成整体实现方案与步骤",
+  "created": "2026-02-18T02:50:41.647677+00:00",
+  "updated": "2026-02-18T03:17:43.918650+00:00",
+  "status": "completed",
+  "mode": "dag",
+  "workspace": "",
+  "stages": {
+    "code-plan": {
+      "agent": "scsun-code-agent",
+      "status": "done",
+      "task": "基于现有 stock-simgame-prod，给出“可真实游玩”技术实现方案：系统架构、实时链路、会话/房间、状态持久化、部署拓扑、性能容量与分阶段里程碑。输出可执行步骤与风险。",
+      "startedAt": "2026-02-18T02:50:46.885955+00:00",
+      "completedAt": "2026-02-18T03:10:22.534273+00:00",
+      "output": "Code方案已回传：12周技术路线（W1-W12），3阶段架构（单机/集群/扩展），全局市场模型，WebSocket实时链路，PG+Redis缓存策略，详细风险表与回避方案。",
+      "logs": [
+        {
+          "time": "2026-02-18T02:50:46.886273+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:10:22.534489+00:00",
+          "event": "status: in-progress → done"
+        }
+      ],
+      "dependsOn": []
+    },
+    "qa-plan": {
+      "agent": "scsun-qa-agent",
+      "status": "done",
+      "task": "给出“可真实游玩”质量与验收方案：功能验收矩阵、并发/稳定性/回归/故障注入策略、发布准入门槛、线上SLO与观测指标、灰度验证步骤。",
+      "startedAt": "2026-02-18T02:50:46.957926+00:00",
+      "completedAt": "2026-02-18T03:10:22.659681+00:00",
+      "output": "QA方案已回传：验收矩阵（功能/体验/稳定性），并发压测目标（50-1000TPS），故障注入（DB/Redis/网络），发布准入（P0=0/P1≤3），SLO（99.9%/P99<500ms），灰度流程（1%→100%）。",
+      "logs": [
+        {
+          "time": "2026-02-18T02:50:46.958185+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:10:22.659957+00:00",
+          "event": "status: in-progress → done"
+        }
+      ],
+      "dependsOn": []
+    },
+    "docs-plan": {
+      "agent": "scsun-docs-agent",
+      "status": "done",
+      "task": "给出“可真实游玩”文档与运营方案：玩家接入指南、运维Runbook、发布与回滚手册、FAQ/已知限制、版本节奏与沟通模板。",
+      "startedAt": "2026-02-18T02:50:47.023774+00:00",
+      "completedAt": "2026-02-18T03:13:31.702703+00:00",
+      "output": "Docs方案已回传：commit=81ef846；LIVE-DOCS-PLAN.md(966行)已完成。包含玩家接入、运维Runbook、发布/回滚手册、FAQ、W1-W4文档节奏（18个文档）与Owner映射。",
+      "logs": [
+        {
+          "time": "2026-02-18T02:50:47.024031+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:13:31.702947+00:00",
+          "event": "status: in-progress → done"
+        }
+      ],
+      "dependsOn": []
+    },
+    "monitor-synthesis": {
+      "agent": "scsun-monitor-agent",
+      "status": "done",
+      "task": "汇总三方方案形成统一执行蓝图：目标定义、阶段路线图、关键依赖、风险清单、决策点、W1-W4落地清单与负责人映射。",
+      "startedAt": "2026-02-18T03:13:31.771220+00:00",
+      "completedAt": "2026-02-18T03:17:43.917154+00:00",
+      "output": "Monitor综合回传：已生成 LIVE-GOAL-MASTER-PLAN.md，包含目标定义、W1-W4统一路线、依赖与风险、Go/No-Go规则、按4个agent分工清单、首周Day1-Day5执行建议。",
+      "logs": [
+        {
+          "time": "2026-02-18T03:13:31.771531+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:17:43.918642+00:00",
+          "event": "status: in-progress → done"
+        }
+      ],
+      "dependsOn": [
+        "code-plan",
+        "qa-plan",
+        "docs-plan"
+      ]
+    }
+  }
+}

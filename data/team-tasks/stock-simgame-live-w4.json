@@ -1,0 +1,90 @@
+{
+  "project": "stock-simgame-live-w4",
+  "goal": "W4最终发布周：性能压测(50-1000TPS)、RC构建、生产部署、D3断网演练",
+  "created": "2026-02-18T07:31:20.706508+00:00",
+  "updated": "2026-02-18T08:16:08.605176+00:00",
+  "status": "completed",
+  "mode": "linear",
+  "workspace": "",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": null,
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "done",
+      "task": "",
+      "startedAt": "2026-02-18T07:33:00.852380+00:00",
+      "completedAt": "2026-02-18T07:42:02.140862+00:00",
+      "output": "W4性能优化与RC构建完成：commit=42e8f53, tag=v1.0.0-rc1。新增分层压测脚本(50/200/500/1000TPS)，修复WS心跳竞态条件。交付物：RELEASE-NOTES.md, scripts/stress-test-layered.js",
+      "logs": [
+        {
+          "time": "2026-02-18T07:33:00.925252+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T07:42:02.141036+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "done",
+      "task": "",
+      "startedAt": "2026-02-18T07:42:02.189555+00:00",
+      "completedAt": "2026-02-18T07:55:04.181048+00:00",
+      "output": "W4验收完成。回归86/86通过(100%)，覆盖率88.14%。压测50TPS通过，200+TPS因连接池限制失败。D3演练：WS重连OK，Redis崩溃需修复(BUG-006 P0)。建议发布v1.0并标注'单机限流100TPS'限制。",
+      "logs": [
+        {
+          "time": "2026-02-18T07:42:02.189867+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T07:55:04.181215+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "done",
+      "task": "",
+      "startedAt": "2026-02-18T07:55:04.225400+00:00",
+      "completedAt": "2026-02-18T08:15:05.279753+00:00",
+      "output": "W4发布文档完成：commit=84627b70，新增CHANGELOG.md(310行)+RELEASE-NOTES.md(533行)+ARCHIVE-W1-W4a.md(361行)，更新README.md(+557行)。v1.0.0-rc1发布文档就绪。",
+      "logs": [
+        {
+          "time": "2026-02-18T07:55:04.225587+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T08:15:05.280216+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "done",
+      "task": "",
+      "startedAt": "2026-02-18T08:15:05.355503+00:00",
+      "completedAt": "2026-02-18T08:16:08.604985+00:00",
+      "output": "W4 Gate Review完成。判定: CONDITIONAL GO(YELLOW)。功能100%完整，覆盖率88.14%，50TPS基准通过。发布条件：1)标注Redis强依赖；2)限流≤100TPS；3)部署Redis高可用。v1.0.0-rc1授权发布。",
+      "logs": [
+        {
+          "time": "2026-02-18T08:15:05.355817+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T08:16:08.605166+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    }
+  }
+}

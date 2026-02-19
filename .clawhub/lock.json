@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "claude-optimised": {
+      "version": "1.0.1",
+      "installedAt": 1770633135755
+    },
+    "hooks-automation": {
+      "version": "1.0.0",
+      "installedAt": 1770633276518
+    },
+    "three-minds": {
+      "version": "0.1.0",
+      "installedAt": 1770633988809
+    },
+    "crawl": {
+      "version": "0.1.0",
+      "installedAt": 1770634036652
+    },
+    "claude-code-supervisor": {
+      "version": "1.0.0",
+      "installedAt": 1770634060731
+    },
+    "ralph-loop-agent": {
+      "version": "1.1.0",
+      "installedAt": 1770634080499
+    }
+  }
+}

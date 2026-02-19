@@ -1,0 +1,90 @@
+{
+  "project": "stock-simgame-live-w1",
+  "goal": "执行 LIVE 目标 W1：服务骨架与标准化落地（可真实游玩第一周）",
+  "created": "2026-02-18T03:21:13.880734+00:00",
+  "updated": "2026-02-18T03:55:52.594847+00:00",
+  "status": "completed",
+  "mode": "linear",
+  "workspace": "",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": null,
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "done",
+      "task": "W1代码落地：1) 搭建 WS+PG+Redis+JWT 服务骨架；2) 统一目录结构与配置；3) 提供健康检查与最小交易闭环接口（注册/登录/下单/持仓查询）；4) 输出可运行命令与验证结果。必须回传 repo_path、commit_sha、关键文件路径。",
+      "startedAt": "2026-02-18T03:21:14.345598+00:00",
+      "completedAt": "2026-02-18T03:29:25.088375+00:00",
+      "output": "Code回传：repo=/Users/shengchun.sun/.openclaw/workspace-scsun-code-agent/stock-simgame-live；commit=01ac8240ce1c901e4d979c0359c4c30553f3e4ac；完成WS+PG+Redis+JWT骨架与最小交易闭环（注册/登录/下单/持仓），10个API，提供docker与验证命令。",
+      "logs": [
+        {
+          "time": "2026-02-18T03:21:14.346038+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:29:25.088618+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "done",
+      "task": "W1质量落地：1) 建立验收矩阵与测试基线；2) 配置单元+集成测试脚手架；3) 输出W1测试清单与PASS/BLOCK门槛；4) 跑通最小回归并给出结果模板。必须回传 test_command 与覆盖率基线。",
+      "startedAt": "2026-02-18T03:29:25.177086+00:00",
+      "completedAt": "2026-02-18T03:40:03.235092+00:00",
+      "output": "QA回传：W1测试脚手架已完成。包含单元/集成测试39个用例；定义覆盖率目标(≥85%)、缺陷分级模板、PASS/BLOCK门槛。已交付文件：__tests__/*.test.js, qa-smoke.sh, W1-ACCEPTANCE-MATRIX.md。结论：CONDITIONAL PASS(脚手架就绪，环境受限待实跑)。",
+      "logs": [
+        {
+          "time": "2026-02-18T03:29:25.177404+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:40:03.235272+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "done",
+      "task": "W1文档落地：1) 玩家接入指南首版；2) API约定文档首版；3) 运维最小Runbook首版；4) 文档与代码commit关联规则。必须回传文件路径与commit_sha。",
+      "startedAt": "2026-02-18T03:40:03.280446+00:00",
+      "completedAt": "2026-02-18T03:55:11.698570+00:00",
+      "output": "Docs回传：commit=15925368；交付4个文档共1910行——PLAYER-GUIDE.md(491行)、API-SPEC.md(539行)、OPS-RUNBOOK.md(477行)、COMMIT-ASSOCIATION.md(403行)。",
+      "logs": [
+        {
+          "time": "2026-02-18T03:40:03.280628+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:55:11.698750+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "done",
+      "task": "W1治理落地：1) 建立周节奏（周一计划/周三纠偏/周五Gate）；2) 建立风险看板与升级路径；3) 定义W1 Go/No-Go准则；4) 汇总三方证据给出W1 Gate结论。",
+      "startedAt": "2026-02-18T03:55:11.742859+00:00",
+      "completedAt": "2026-02-18T03:55:52.594590+00:00",
+      "output": "Monitor Gate结论：CONDITIONAL GO (YELLOW)。三方核心产物已就绪，可进入W2，但Docker实跑缺口需48h内清零。前置条件：1)QA在Docker环境完成smoke实跑；2)覆盖率实测≥85%；3)按Runbook执行端到端演练。",
+      "logs": [
+        {
+          "time": "2026-02-18T03:55:11.743083+00:00",
+          "event": "status: pending → in-progress"
+        },
+        {
+          "time": "2026-02-18T03:55:52.594841+00:00",
+          "event": "status: in-progress → done"
+        }
+      ]
+    }
+  }
+}

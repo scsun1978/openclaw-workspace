@@ -1,0 +1,36 @@
+{
+  "servers": [
+    {
+      "name": "dev02",
+      "host": "172.16.100.101",
+      "user": "scsun",
+      "location": "Local Network",
+      "role": "development",
+      "services": ["stock-simgame-live", "ragflow"],
+      "status": "active",
+      "added_date": "2025-01-01"
+    },
+    {
+      "name": "cloudafra-tokyo01",
+      "host": "52.198.15.20",
+      "private_ip": "172.26.11.179",
+      "user": "ubuntu",
+      "ssh_key": "cloudafra_tokyo",
+      "location": "Tokyo, Japan",
+      "provider": "cloudafra.com",
+      "specs": {
+        "cpu": 2,
+        "ram": "512MB",
+        "disk": "20GB"
+      },
+      "billing": {
+        "cost": "$50.40/year",
+        "next_due": "2027-02-18"
+      },
+      "role": "ddns-node",
+      "ddns_domain": "tokyo01.artfox.ltd",
+      "status": "active",
+      "added_date": "2026-02-18"
+    }
+  ]
+}
