@@ -2,7 +2,7 @@
  * 成就系统服务
  */
 
-const { query } = require('../database/db');
+const { query } = require('./database/db');
 const { broadcast } = require('./websocket');
 
 // 成就缓存

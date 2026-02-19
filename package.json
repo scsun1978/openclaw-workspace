@@ -14,7 +14,10 @@
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
       "stats-service.js",
-      "kline-service.js"
+      "kline-service.js",
+      "task-service.js",
+      "achievement-service.js",
+      "leaderboard-service.js"
     ],
     "testMatch": [
       "**/__tests__/**/*.test.js"
