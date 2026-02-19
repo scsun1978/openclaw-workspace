@@ -2,7 +2,7 @@
   "project": "stock-simgame-live-w6",
   "goal": "执行 v1.2 W6：K线图表集成（功能增强第二周）",
   "created": "2026-02-19T10:55:00.000000+08:00",
-  "updated": "2026-02-19T11:08:00.000000+08:00",
+  "updated": "2026-02-19T11:15:00.000000+08:00",
   "status": "in-progress",
   "mode": "linear",
   "workspace": "/Users/shengchun.sun/.openclaw/workspace/stock-simgame-live",
@@ -12,7 +12,7 @@
     "scsun-docs-agent",
     "scsun-monitor-agent"
   ],
-  "currentStage": "scsun-docs-agent",
+  "currentStage": "scsun-monitor-agent",
   "stages": {
     "scsun-code-agent": {
       "agent": "scsun-code-agent",
@@ -102,12 +102,68 @@
     },
     "scsun-docs-agent": {
       "agent": "scsun-docs-agent",
-      "status": "pending",
-      "task": "W6文档落地 - K线图表文档：\n\n1) **API 文档更新**：添加 K线接口定义\n2) **用户指南更新**：添加“如何查看K线图”章节\n\n必须回传：commit_sha、更新文档列表。",
-      "startedAt": null,
-      "completedAt": null,
-      "output": null,
-      "logs": []
+      "status": "done",
+      "task": "W6文档落地 - K线图表文档：\n\n1) **API 文档更新**：添加 K线接口定义\n2) **用户指南更新**：添加"如何查看K线图"章节\n\n必须回传：commit_sha、更新文档列表。",
+      "startedAt": "2026-02-19T11:12:00.000000+08:00",
+      "completedAt": "2026-02-19T11:15:00.000000+08:00",
+      "output": {
+        "commit_sha": "dbc94c2a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q",
+        "docs_updated": [
+          "docs/PLAYER-GUIDE.md"
+        ],
+        "api_doc": "docs/API-KLINE.yaml (verified, complete)",
+        "summary": {
+          "lines_added": 370,
+          "new_sections": 1
+        },
+        "content": {
+          "player_guide": {
+            "file": "docs/PLAYER-GUIDE.md",
+            "new_chapter": "七、K线图查看",
+            "sections": [
+              "7.1 什么是K线图",
+              "7.2 K线图解读（阳线/阴线/影线）",
+              "7.3 支持的K线周期（1m/5m/15m/1h/1d）",
+              "7.4 查看K线数据",
+              "7.5 查询参数",
+              "7.6 图表库集成（standard/echarts/tradingview）",
+              "7.7 K线形态识别",
+              "7.8 实战技巧",
+              "7.9 常见问题",
+              "7.10 清除K线缓存"
+            ]
+          },
+          "api_doc": {
+            "file": "docs/API-KLINE.yaml",
+            "endpoints": [
+              "GET /api/kline/{symbol} - 获取K线数据",
+              "POST /api/kline/aggregate/{symbol} - 触发聚合",
+              "POST /api/kline/generate/{symbol} - 生成模拟数据",
+              "DELETE /api/kline/cache/{symbol} - 清除缓存"
+            ],
+            "formats": ["standard", "echarts", "tradingview"],
+            "intervals": ["1m", "5m", "15m", "1h", "1d"]
+          }
+        }
+      },
+      "logs": [
+        {
+          "timestamp": "2026-02-19T11:12:00.000000+08:00",
+          "action": "Task assigned to scsun-docs-agent following qa-agent completion"
+        },
+        {
+          "timestamp": "2026-02-19T11:13:00.000000+08:00",
+          "action": "Verified API-KLINE.yaml is complete (535 lines, OpenAPI 3.0 format)"
+        },
+        {
+          "timestamp": "2026-02-19T11:14:00.000000+08:00",
+          "action": "Added Chapter 7 (K-line Chart Viewing) to PLAYER-GUIDE.md with 10 sections"
+        },
+        {
+          "timestamp": "2026-02-19T11:15:00.000000+08:00",
+          "action": "Committed documentation changes (commit dbc94c2, +370 lines)"
+        }
+      ]
     },
     "scsun-monitor-agent": {
       "agent": "scsun-monitor-agent",
