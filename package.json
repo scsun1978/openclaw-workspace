@@ -13,7 +13,8 @@
     "testEnvironment": "node",
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
-      "stats-service.js"
+      "stats-service.js",
+      "kline-service.js"
     ],
     "testMatch": [
       "**/__tests__/**/*.test.js"
