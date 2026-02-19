@@ -1,0 +1,70 @@
+{
+  "project": "stock-simgame-live-w13",
+  "goal": "执行 v1.5 W13：生产环境部署演练（蓝绿发布与高可用验证）",
+  "created": "2026-02-19T17:10:00.000000+08:00",
+  "updated": "2026-02-19T17:10:00.000000+08:00",
+  "status": "in-progress",
+  "mode": "linear",
+  "workspace": "/Users/shengchun.sun/.openclaw/workspace/stock-simgame-live",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": "scsun-code-agent",
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "completed",
+      "task": "W13运维落地 - 生产部署演练：\n\n1) **蓝绿发布脚本实现**\n   - 实现 Docker 服务滚动更新与切换脚本\n   - 实现版本回滚自动化\n\n2) **高可用配置验证**\n   - 配置 Redis Sentinel/Cluster 模式\n   - 配置 PostgreSQL 主从同步 with 自动故障切换\n\n3) **监控告警联调**\n   - 配置 Prometheus/Grafana 核心指标看板\n   - 集成 AlertManager 实现关键告警触达\n\n必须回传：部署脚本、HA 拓扑图、监控看板截图（描述）。",
+      "startedAt": "2026-02-19T17:10:00.000000+08:00",
+      "completedAt": "2026-02-19T17:40:00.000000+08:00",
+      "output": {
+        "commit_sha": "59fca72c466f393f600b90a97e95f5b6177b7605",
+        "scripts": ["scripts/deploy-blue-green.sh", "scripts/rollback.sh", "scripts/verify-db-ha.sh"],
+        "monitoring": ["monitoring/prometheus.yml", "monitoring/grafana-dashboard.json"],
+        "docs": "docs/OPERATIONS-TOOLSET.md"
+      },
+      "logs": [
+        {
+          "timestamp": "2026-02-19T17:10:00.000000+08:00",
+          "action": "W13 project initialized for production deployment drill"
+        },
+        {
+          "timestamp": "2026-02-19T17:40:00.000000+08:00",
+          "action": "Implemented blue-green deployment scripts, HA verification tools, and monitoring configurations."
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "pending",
+      "task": "W13质量落地 - 容灾与切换测试：\n\n1) 蓝绿切换平滑度测试（零停机验证）\n2) 数据库/缓存故障强杀测试（Failover 耗时验证）\n3) 告警触发时效性验证\n\n必须输出：切换停机时间、故障恢复时间 (RTO/RPO) 报告。",
+      "startedAt": null,
+      "completedAt": null,
+      "output": null,
+      "logs": []
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "pending",
+      "task": "W13文档落地 - 运维手册：\n\n1) 生产环境发布作业指导书 (SOP)\n2) 应急预案与回退流程\n3) 基础设施维护手册\n\n必须回传：commit_sha、文档列表。",
+      "startedAt": null,
+      "completedAt": null,
+      "output": null,
+      "logs": []
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "pending",
+      "task": "W13治理落地 - v1.5 运维就绪度审计：\n\n1) HA 切换能力验收\n2) 运维 SOP 完整性评审\n3) Gate 结论：GO/NO-GO 判定",
+      "startedAt": null,
+      "completedAt": null,
+      "output": null,
+      "logs": []
+    }
+  },
+  "dependencies": ["stock-simgame-live-w12"],
+  "version_target": "v1.5"
+}
