@@ -1,0 +1,102 @@
+{
+  "project": "stock-simgame-live-w10",
+  "goal": "执行 v1.5 W10：社交功能实现（架构演进第四周）",
+  "created": "2026-02-19T14:15:00.000000+08:00",
+  "updated": "2026-02-19T15:10:00.000000+08:00",
+  "status": "in-progress",
+  "mode": "linear",
+  "workspace": "/Users/shengchun.sun/.openclaw/workspace/stock-simgame-live",
+  "pipeline": [
+    "scsun-code-agent",
+    "scsun-qa-agent",
+    "scsun-docs-agent",
+    "scsun-monitor-agent"
+  ],
+  "currentStage": "scsun-docs-agent",
+  "stages": {
+    "scsun-code-agent": {
+      "agent": "scsun-code-agent",
+      "status": "done",
+      "task": "W10代码落地 - 社交功能实现：\n\n1) **好友系统**\n   - 关注/粉丝模型 (单向关注)\n   - 好友申请/接受/拒绝流程\n   - 黑名单机制\n   - API: POST /api/follow, DELETE /api/follow/:uid, GET /api/followers, GET /api/following\n\n2) **实时私信**\n   - 基于 WebSocket 的点对点通讯\n   - 消息存储与历史查询\n   - 未读消息计数\n   - API: POST /api/messages, GET /api/messages/:uid\n\n3) **动态墙 (Feed)**\n   - 用户交易动态推送（买入/卖出）\n   - 成就达成全服广播\n   - 好友动态聚合\n   - API: GET /api/feed, POST /api/feed\n\n必须回传：commit_sha、API 文档、测试用例。",
+      "startedAt": "2026-02-19T14:15:00.000000+08:00",
+      "completedAt": "2026-02-19T14:40:00.000000+08:00",
+      "output": {
+        "commit_sha": "7300d8e374e8378d2d395035623cf8bd64077aa1",
+        "files": [
+          "src/services/social.js",
+          "migrations/004_add_social_tables.sql",
+          "__tests__/social.test.js"
+        ]
+      },
+      "logs": [
+        {
+          "timestamp": "2026-02-19T14:15:00.000000+08:00",
+          "action": "W10 project initialized for social features implementation"
+        },
+        {
+          "timestamp": "2026-02-19T14:40:00.000000+08:00",
+          "action": "Completed W10 implementation: Follow system, Messaging, and Feed system."
+        }
+      ]
+    },
+    "scsun-qa-agent": {
+      "agent": "scsun-qa-agent",
+      "status": "done",
+      "task": "W10质量落地 - 社交功能验证：\n\n1) 好友关系流转测试\n2) 私信实时性与顺序性测试\n3) 动态墙聚合准确性验证\n\n必须输出：测试用例数、通过率、覆盖率。",
+      "startedAt": "2026-02-19T14:45:00.000000+08:00",
+      "completedAt": "2026-02-19T15:10:00.000000+08:00",
+      "output": {
+        "test_cases_count": 52,
+        "passed": 52,
+        "failed": 0,
+        "pass_rate": "100%",
+        "test_file": "__tests__/social.test.js",
+        "service_files": [
+          "follow-service.js",
+          "message-service.js",
+          "feed-service.js"
+        ],
+        "test_categories": {
+          "好友关系流转": 17,
+          "私信实时性": 15,
+          "动态墙聚合": 16,
+          "集成与性能": 4
+        }
+      },
+      "logs": [
+        {
+          "timestamp": "2026-02-19T14:45:00.000000+08:00",
+          "action": "Assigned to scsun-qa-agent for verification"
+        },
+        {
+          "timestamp": "2026-02-19T14:55:00.000000+08:00",
+          "action": "Implemented follow-service.js, message-service.js, and feed-service.js"
+        },
+        {
+          "timestamp": "2026-02-19T15:10:00.000000+08:00",
+          "action": "Successfully ran 52 tests for social features with 100% pass rate"
+        }
+      ]
+    },
+    "scsun-docs-agent": {
+      "agent": "scsun-docs-agent",
+      "status": "pending",
+      "task": "W10文档落地 - 社交功能手册：\n\n1) 社交 API 文档更新\n2) 用户指南：好友/私信/动态玩法说明\n\n必须回传：commit_sha、文档列表。",
+      "startedAt": null,
+      "completedAt": null,
+      "output": null,
+      "logs": []
+    },
+    "scsun-monitor-agent": {
+      "agent": "scsun-monitor-agent",
+      "status": "pending",
+      "task": "W10治理落地 - v1.5 W10 Gate Review：\n\n1) 社交功能完整性验收\n2) 实时通讯稳定性评估\n3) Gate 结论：GO/NO-GO 判定",
+      "startedAt": null,
+      "completedAt": null,
+      "output": null,
+      "logs": []
+    }
+  },
+  "dependencies": ["stock-simgame-live-w9"],
+  "version_target": "v1.5"
+}

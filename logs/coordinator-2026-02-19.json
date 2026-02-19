@@ -8,5 +8,45 @@
     "reason": null,
     "error": null,
     "push_count": 1
+  },
+  {
+    "timestamp": "2026-02-19T14:33:08.145587",
+    "project": "stock-simgame-live-w10",
+    "stage": "scsun-code-agent",
+    "action": "auto-push",
+    "result": "success",
+    "reason": null,
+    "error": null,
+    "push_count": 1
+  },
+  {
+    "timestamp": "2026-02-19T14:38:20.982199",
+    "project": "stock-simgame-live-w10",
+    "stage": "scsun-code-agent",
+    "action": "auto-push",
+    "result": "skipped",
+    "reason": "cooldown",
+    "error": "Cooldown active (5.2m < 15m), skip duplicate push",
+    "push_count": 0
+  },
+  {
+    "timestamp": "2026-02-19T14:58:13.190911",
+    "project": "stock-simgame-live-w10",
+    "stage": "scsun-qa-agent",
+    "action": "auto-push",
+    "result": "success",
+    "reason": null,
+    "error": null,
+    "push_count": 1
+  },
+  {
+    "timestamp": "2026-02-19T15:03:16.251253",
+    "project": "stock-simgame-live-w10",
+    "stage": "scsun-qa-agent",
+    "action": "auto-push",
+    "result": "skipped",
+    "reason": "cooldown",
+    "error": "Cooldown active (5.1m < 15m), skip duplicate push",
+    "push_count": 0
   }
 ]
