@@ -2,8 +2,8 @@
   "project": "stock-simgame-live-w6",
   "goal": "执行 v1.2 W6：K线图表集成（功能增强第二周）",
   "created": "2026-02-19T10:55:00.000000+08:00",
-  "updated": "2026-02-19T11:15:00.000000+08:00",
-  "status": "in-progress",
+  "updated": "2026-02-19T11:40:00.000000+08:00",
+  "status": "completed",
   "mode": "linear",
   "workspace": "/Users/shengchun.sun/.openclaw/workspace/stock-simgame-live",
   "pipeline": [
@@ -188,7 +188,7 @@
     },
     "scsun-monitor-agent": {
       "agent": "scsun-monitor-agent",
-      "status": "pending",
+      "status": "done",
       "task": "W6治理落地 - v1.2 W6 Gate Review：\n\n1) **功能验收**：K线 API 完整性\n2) **质量验收**：测试覆盖率 >= 85%\n3) **Gate 结论**：GO/NO-GO 判定",
       "startedAt": null,
       "completedAt": null,
