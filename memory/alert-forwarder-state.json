@@ -1,5 +1,10 @@
 {
-  "lastCheck": "2026-02-19T19:00:00+08:00",
+  "lastCheck": "2026-02-21T12:10:00+08:00",
   "forwardedTasks": [],
-  "noAlertsSince": "2026-02-19T12:15:00+08:00"
+  "noAlertsSince": "2026-02-19T12:15:00+08:00",
+  "lastResult": "NO_ALERT",
+  "messagesScanned": 20,
+  "alertsFound": [],
+  "scannedSession": "agent:scsun-monitor-agent:telegram:group:-5186938821",
+  "note": "Scanned 20 messages at 2026-02-21 12:10, found 0 RED alerts. Messages contain: model stats reports (0218/0219/0220), Dashboard design spec, agent proactive limit discussion, current task report. All alerts are GREEN or YELLOW level."
 }

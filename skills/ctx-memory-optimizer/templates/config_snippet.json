@@ -1,0 +1,34 @@
+{
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "agents": {
+    "defaults": {
+      "contextTokens": 150000,
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h",
+        "keepLastAssistants": 5,
+        "softTrim": {
+          "maxChars": 10000,
+          "headChars": 3000,
+          "tailChars": 3000
+        },
+        "hardClear": {
+          "enabled": true,
+          "placeholder": "[旧的工具结果已清除]"
+        }
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokensFloor": 20000,
+        "memoryFlush": {
+          "enabled": true,
+          "softThresholdTokens": 10000,
+          "systemPrompt": "会话即将压缩，请将重要信息写入记忆。",
+          "prompt": "将持久化笔记写入 memory/YYYY-MM-DD.md；如无内容请回复 NO_REPLY。"
+        }
+      }
+    }
+  }
+}

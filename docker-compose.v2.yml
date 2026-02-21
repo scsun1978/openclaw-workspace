@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: stock-simgame-v2-ui
+    ports:
+      - "3006:3000"  # Next.js defaults to 3000 inside, map to host 3006
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=https://gamestock.artfox.ltd/api
+      - NEXT_PUBLIC_WS_URL=wss://gamestock.artfox.ltd/ws
+    networks:
+      - stock-simgame-net
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stock-simgame-v2-app
+    ports:
+      - "3005:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/stock_simgame_live
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=your-production-secret-change-me
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - stock-simgame-net
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: stock-simgame-v2-db
+    environment:
+      POSTGRES_DB: stock_simgame_live
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_v2:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stock-simgame-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: stock-simgame-v2-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data_v2:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - stock-simgame-net
+
+volumes:
+  postgres_data_v2:
+  redis_data_v2:
+
+networks:
+  stock-simgame-net:
+    driver: bridge

@@ -1,8 +1,9 @@
 {
   "lastChecks": {
     "task-coordinator": 1739921880,
-    "lastCheckTime": "2026-02-19T12:10:00+08:00",
-    "red-alert-forwarder": 1771506962
+    "lastCheckTime": "2026-02-20T10:05:00+08:00",
+    "red-alert-forwarder": 1771696200,
+    "red-alert-last-run": "2026-02-21T11:10:00+08:00"
   },
   "forwardedAlerts": {
     "T-STOCK-SIMGAME-LIVE-W3-004": {

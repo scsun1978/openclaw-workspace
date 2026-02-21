@@ -1,0 +1,16 @@
+[
+  {
+    "timestamp": "2026-02-20T18:28:00+08:00",
+    "action": "check-all",
+    "result": "success",
+    "projects_checked": 4,
+    "stuck_tasks": 0,
+    "projects": [
+      {"name": "login-feature", "status": "normal"},
+      {"name": "stock-simgame-v2-frontend", "status": "normal"},
+      {"name": "stock-simgame", "status": "normal"},
+      {"name": "task-cli", "status": "normal"}
+    ],
+    "message": "所有项目状态正常，无需推送"
+  }
+]

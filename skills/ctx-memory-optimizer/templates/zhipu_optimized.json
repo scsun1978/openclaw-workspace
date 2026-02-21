@@ -1,0 +1,85 @@
+{
+  "_comment": "智谱 AI (zai/glm-5) 完整优化配置",
+  
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "zai/glm-5",
+        "fallbacks": ["zai/glm-4.7"]
+      },
+      "models": {
+        "zai/glm-5": {
+          "alias": "GLM"
+        }
+      },
+      
+      "_comment_contextTokens": "限制上下文在 150K，保留 50K 用于输出",
+      "contextTokens": 150000,
+      
+      "_comment_compaction": "压缩配置 + 自动记忆刷新",
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokensFloor": 20000,
+        "memoryFlush": {
+          "enabled": true,
+          "softThresholdTokens": 10000,
+          "systemPrompt": "会话即将压缩，请将重要信息写入记忆。决策、偏好、约束写入 MEMORY.md，日常笔记写入 memory/YYYY-MM-DD.md。",
+          "prompt": "将持久化笔记写入 memory/YYYY-MM-DD.md；如无内容请回复 NO_REPLY。"
+        }
+      },
+      
+      "_comment_contextPruning": "工具输出修剪，1小时前的旧输出会被清理",
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h",
+        "keepLastAssistants": 5,
+        "softTrim": {
+          "maxChars": 10000,
+          "headChars": 3000,
+          "tailChars": 3000
+        },
+        "hardClear": {
+          "enabled": true,
+          "placeholder": "[旧的工具结果已清除，详见日志文件]"
+        },
+        "tools": {
+          "allow": ["*"],
+          "deny": []
+        }
+      },
+      
+      "_comment_concurrency": "并发控制",
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      
+      "_comment_memorySearch": "Memory 搜索配置（使用本地 vLLM）",
+      "memorySearch": {
+        "provider": "openai",
+        "model": "/Volumes/HAGIBIS/lmstudio/models/mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ",
+        "remote": {
+          "baseUrl": "http://localhost:8001/v1/",
+          "apiKey": "not-needed"
+        },
+        "fallback": "none",
+        "query": {
+          "hybrid": {
+            "enabled": true,
+            "vectorWeight": 0.7,
+            "textWeight": 0.3
+          }
+        },
+        "cache": {
+          "enabled": true,
+          "maxEntries": 50000
+        }
+      }
+    }
+  },
+  
+  "_comment_session": "会话配置",
+  "session": {
+    "dmScope": "per-channel-peer"
+  }
+}
