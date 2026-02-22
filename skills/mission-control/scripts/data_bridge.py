@@ -44,31 +44,68 @@ def write_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def index_memory_files():
-    """索引所有 memory 文件"""
+    """索引所有 memory 文件（递归扫描子目录）"""
     memory_dir = WORKSPACE / "memory"
     index = {
         "files": [],
         "last_update": datetime.now().isoformat(),
-        "total_files": 0
+        "total_files": 0,
+        "categories": {
+            "daily": [],
+            "stats": [],
+            "index": []
+        }
     }
     
     if memory_dir.exists():
+        # 扫描根目录
         for md_file in sorted(memory_dir.glob("*.md"), reverse=True):
             stat = md_file.stat()
-            index["files"].append({
+            file_info = {
                 "name": md_file.name,
                 "path": str(md_file.relative_to(WORKSPACE)),
                 "size": stat.st_size,
-                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat()
-            })
+                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                "category": "index"
+            }
+            index["files"].append(file_info)
+            index["categories"]["index"].append(file_info)
+        
+        # 递归扫描子目录
+        for md_file in sorted(memory_dir.rglob("*.md"), reverse=True):
+            if md_file.parent == memory_dir:
+                continue  # 跳过根目录（已处理）
+            
+            stat = md_file.stat()
+            rel_path = str(md_file.relative_to(WORKSPACE))
+            
+            # 根据路径确定分类
+            if "archive/daily" in rel_path:
+                category = "daily"
+            elif "archive/stats" in rel_path:
+                category = "stats"
+            else:
+                category = "other"
+            
+            file_info = {
+                "name": md_file.name,
+                "path": rel_path,
+                "size": stat.st_size,
+                "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                "category": category
+            }
+            index["files"].append(file_info)
+            if category in index["categories"]:
+                index["categories"][category].append(file_info)
+        
         index["total_files"] = len(index["files"])
     
     write_json(MEMORY_INDEX, index)
     return index
 
 def generate_memory_canvas():
-    """生成 Memory Canvas"""
-    index = read_json(MEMORY_INDEX, {"files": []})
+    """生成 Memory Canvas（支持分类显示）"""
+    index = read_json(MEMORY_INDEX, {"files": [], "categories": {}})
     
     nodes = [
         {
@@ -76,17 +113,14 @@ def generate_memory_canvas():
             "type": "text",
             "text": "# 🧠 Memory\n\n可搜索的记忆库",
             "x": 0,
-            "y": -400,
+            "y": -500,
             "width": 400,
             "height": 100
-        }
-    ]
-    
-    # 长期记忆
-    nodes.append({
-        "id": "long-term",
-        "type": "text",
-        "text": """## 📚 长期记忆
+        },
+        {
+            "id": "long-term",
+            "type": "text",
+            "text": """## 📚 长期记忆
 
 **文件**: `MEMORY.md`
 
@@ -98,31 +132,60 @@ def generate_memory_canvas():
 
 ---
 搜索: `memory_search "关键词"`""",
-        "x": -400,
-        "y": -200,
-        "width": 350,
-        "height": 280,
-        "color": "6"
-    })
+            "x": -500,
+            "y": -300,
+            "width": 350,
+            "height": 280,
+            "color": "6"
+        }
+    ]
     
-    # 最近记忆文件
-    recent_files = index.get("files", [])[:8]
-    y_pos = -200
-    for i, f in enumerate(recent_files):
-        nodes.append({
-            "id": f"mem-{i}",
-            "type": "text",
-            "text": f"""### 📄 {f['name']}
+    # 索引文件（MEMORY-INDEX.md）
+    index_files = index.get("categories", {}).get("index", [])
+    if index_files:
+        for i, f in enumerate(index_files[:2]):
+            nodes.append({
+                "id": f"idx-{i}",
+                "type": "text",
+                "text": f"""### 📋 {f['name']}
 
 大小: {f['size']} bytes
 修改: {f['modified'][:10]}""",
-            "x": 100,
-            "y": y_pos,
-            "width": 300,
-            "height": 100,
-            "color": "4" if i == 0 else "0"
-        })
-        y_pos += 120
+                "x": -100,
+                "y": -300 + i * 120,
+                "width": 300,
+                "height": 100,
+                "color": "4"
+            })
+    
+    # 每日日志
+    daily_files = index.get("categories", {}).get("daily", [])
+    if daily_files:
+        daily_node = {
+            "id": "daily-title",
+            "type": "text",
+            "text": f"## 📅 每日日志\n\n共 {len(daily_files)} 个文件",
+            "x": 250,
+            "y": -300,
+            "width": 200,
+            "height": 80,
+            "color": "3"
+        }
+        nodes.append(daily_node)
+        
+        y_pos = -180
+        for i, f in enumerate(daily_files[:5]):
+            nodes.append({
+                "id": f"daily-{i}",
+                "type": "text",
+                "text": f"📄 {f['name'][:16]}\n{f['size']} bytes",
+                "x": 250,
+                "y": y_pos,
+                "width": 180,
+                "height": 60,
+                "color": "0"
+            })
+            y_pos += 70
     
     # 统计
     nodes.append({
@@ -131,14 +194,16 @@ def generate_memory_canvas():
         "text": f"""## 📊 统计
 
 - **总计**: {index.get('total_files', 0)} 个文件
+- **索引**: {len(index_files)}
+- **日志**: {len(daily_files)}
 - **最近更新**: {index.get('last_update', 'N/A')[:16]}
 
 ---
 目录: `memory/`""",
-        "x": 450,
-        "y": -200,
+        "x": -500,
+        "y": 50,
         "width": 300,
-        "height": 180,
+        "height": 200,
         "color": "5"
     })
     
