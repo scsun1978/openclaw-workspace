@@ -6,6 +6,8 @@ Mission Control 数据桥接器
 
 import json
 import os
+import re
+import subprocess
 import glob
 from datetime import datetime
 from pathlib import Path
@@ -15,12 +17,21 @@ WORKSPACE = Path("/Users/shengchun.sun/.openclaw/workspace")
 VAULT_PATH = Path("/Users/shengchun.sun/Library/Mobile Documents/iCloud~md~obsidian/Documents/ctovault")
 MISSION_CONTROL = VAULT_PATH / "Mission Control"
 
+# Agent 定义
+AGENTS = [
+    {"id": "scsun-monitor-agent", "name": "Monitor", "emoji": "🔍", "role": "监控与协调"},
+    {"id": "scsun-code-agent", "name": "Code", "emoji": "💻", "role": "代码实现"},
+    {"id": "scsun-docs-agent", "name": "Docs", "emoji": "📝", "role": "文档编写"},
+    {"id": "scsun-qa-agent", "name": "QA", "emoji": "🧪", "role": "质量测试"},
+]
+
 # 状态导出文件
 EXPORT_DIR = WORKSPACE / "mission-control-export"
 CRON_EXPORT = EXPORT_DIR / "cron-status.json"
 SESSIONS_EXPORT = EXPORT_DIR / "sessions-status.json"
 SUBAGENTS_EXPORT = EXPORT_DIR / "subagents-status.json"
 MEMORY_INDEX = EXPORT_DIR / "memory-index.json"
+AGENT_MEMORY_EXPORT = EXPORT_DIR / "agent-memory-status.json"
 
 def ensure_export_dir():
     """确保导出目录存在"""
@@ -103,8 +114,90 @@ def index_memory_files():
     write_json(MEMORY_INDEX, index)
     return index
 
-def generate_memory_canvas():
-    """生成 Memory Canvas（支持分类显示）"""
+def get_agent_memory_status():
+    """获取所有 Agent 的 Memory 状态"""
+    agent_status = []
+    
+    try:
+        result = subprocess.run(
+            ["openclaw", "memory", "status"],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        output = result.stdout
+        
+        # 解析每个 agent 的状态
+        current_agent = None
+        agent_data = {}
+        
+        for line in output.split('\n'):
+            line = line.strip()
+            
+            # 检测 agent 名称
+            if line.startswith('Memory Search ('):
+                if current_agent and agent_data:
+                    agent_status.append(agent_data)
+                agent_name = re.search(r'Memory Search \(([^)]+)\)', line)
+                current_agent = agent_name.group(1) if agent_name else None
+                agent_data = {
+                    "agent_id": current_agent,
+                    "name": current_agent.replace("scsun-", "").replace("-agent", "").title(),
+                    "indexed_files": 0,
+                    "total_files": 0,
+                    "chunks": 0,
+                    "memory_files": 0,
+                    "session_files": 0,
+                    "embedding_model": "",
+                    "status": "unknown"
+                }
+            
+            elif current_agent:
+                # 解析索引信息: "Indexed: 528/1945 files · 2790 chunks"
+                if line.startswith('Indexed:'):
+                    match = re.search(r'Indexed: (\d+)/(\d+) files · (\d+) chunks', line)
+                    if match:
+                        agent_data["indexed_files"] = int(match.group(1))
+                        agent_data["total_files"] = int(match.group(2))
+                        agent_data["chunks"] = int(match.group(3))
+                
+                # 解析 memory 来源
+                elif 'memory ·' in line:
+                    match = re.search(r'memory · (\d+)/(\d+) files', line)
+                    if match:
+                        agent_data["memory_files"] = int(match.group(1))
+                
+                # 解析 sessions 来源
+                elif 'sessions ·' in line:
+                    match = re.search(r'sessions · (\d+)/(\d+) files', line)
+                    if match:
+                        agent_data["session_files"] = int(match.group(1))
+                
+                # 解析 embedding model
+                elif line.startswith('Model:'):
+                    agent_data["embedding_model"] = line.replace('Model:', '').strip()
+                
+                # 检测向量状态
+                elif line.startswith('Vector:'):
+                    agent_data["status"] = "ready" if "ready" in line else "error"
+        
+        # 添加最后一个 agent
+        if current_agent and agent_data:
+            agent_status.append(agent_data)
+    
+    except Exception as e:
+        print(f"⚠️ Failed to get agent memory status: {e}")
+    
+    # 保存到文件
+    write_json(AGENT_MEMORY_EXPORT, {
+        "agents": agent_status,
+        "last_update": datetime.now().isoformat()
+    })
+    
+    return agent_status
+
+def generate_memory_canvas(agent_status=None):
+    """生成 Memory Canvas（支持分类显示 + Agent 记忆分析）"""
     index = read_json(MEMORY_INDEX, {"files": [], "categories": {}})
     
     nodes = [
@@ -113,7 +206,7 @@ def generate_memory_canvas():
             "type": "text",
             "text": "# 🧠 Memory\n\n可搜索的记忆库",
             "x": 0,
-            "y": -500,
+            "y": -600,
             "width": 400,
             "height": 100
         },
@@ -132,8 +225,8 @@ def generate_memory_canvas():
 
 ---
 搜索: `memory_search "关键词"`""",
-            "x": -500,
-            "y": -300,
+            "x": -600,
+            "y": -400,
             "width": 350,
             "height": 280,
             "color": "6"
@@ -151,8 +244,8 @@ def generate_memory_canvas():
 
 大小: {f['size']} bytes
 修改: {f['modified'][:10]}""",
-                "x": -100,
-                "y": -300 + i * 120,
+                "x": -200,
+                "y": -400 + i * 120,
                 "width": 300,
                 "height": 100,
                 "color": "4"
@@ -165,21 +258,21 @@ def generate_memory_canvas():
             "id": "daily-title",
             "type": "text",
             "text": f"## 📅 每日日志\n\n共 {len(daily_files)} 个文件",
-            "x": 250,
-            "y": -300,
+            "x": 150,
+            "y": -400,
             "width": 200,
             "height": 80,
             "color": "3"
         }
         nodes.append(daily_node)
         
-        y_pos = -180
-        for i, f in enumerate(daily_files[:5]):
+        y_pos = -280
+        for i, f in enumerate(daily_files[:4]):
             nodes.append({
                 "id": f"daily-{i}",
                 "type": "text",
                 "text": f"📄 {f['name'][:16]}\n{f['size']} bytes",
-                "x": 250,
+                "x": 150,
                 "y": y_pos,
                 "width": 180,
                 "height": 60,
@@ -187,23 +280,94 @@ def generate_memory_canvas():
             })
             y_pos += 70
     
-    # 统计
+    # Agent 记忆分析
+    if agent_status:
+        # Agent 区域标题
+        nodes.append({
+            "id": "agents-title",
+            "type": "text",
+            "text": "## 🤖 Agent 记忆分析\n\n各 Agent 的记忆存储状态",
+            "x": -600,
+            "y": -50,
+            "width": 400,
+            "height": 100,
+            "color": "5"
+        })
+        
+        # 各 Agent 节点
+        agent_colors = {"Monitor": "4", "Code": "3", "Docs": "2", "Qa": "1"}
+        x_positions = [-600, -200, 200, 600]
+        
+        for i, agent in enumerate(agent_status[:4]):
+            name = agent.get("name", "Unknown")
+            chunks = agent.get("chunks", 0)
+            indexed = agent.get("indexed_files", 0)
+            total = agent.get("total_files", 0)
+            mem_files = agent.get("memory_files", 0)
+            sess_files = agent.get("session_files", 0)
+            status = agent.get("status", "unknown")
+            
+            # 根据 chunks 数量决定状态颜色
+            if chunks > 1000:
+                status_emoji = "🟢"
+                color = "4"
+            elif chunks > 100:
+                status_emoji = "🟡"
+                color = "3"
+            elif chunks > 0:
+                status_emoji = "🟠"
+                color = "1"
+            else:
+                status_emoji = "⚪"
+                color = "0"
+            
+            # Agent emoji
+            agent_emoji = {"Monitor": "🔍", "Code": "💻", "Docs": "📝", "Qa": "🧪"}.get(name, "🤖")
+            role = {"Monitor": "监控", "Code": "代码", "Docs": "文档", "Qa": "测试"}.get(name, "")
+            
+            nodes.append({
+                "id": f"agent-{i}",
+                "type": "text",
+                "text": f"""### {status_emoji} {agent_emoji} {name}
+
+**角色**: {role}
+**Chunks**: {chunks:,}
+**文件**: {indexed}/{total}
+- Memory: {mem_files}
+- Sessions: {sess_files}
+
+**状态**: {status}""",
+                "x": x_positions[i] if i < len(x_positions) else -600 + i * 400,
+                "y": 100,
+                "width": 350,
+                "height": 220,
+                "color": color
+            })
+    
+    # 总统计
+    total_chunks = sum(a.get("chunks", 0) for a in (agent_status or []))
+    total_indexed = sum(a.get("indexed_files", 0) for a in (agent_status or []))
+    
     nodes.append({
         "id": "stats",
         "type": "text",
-        "text": f"""## 📊 统计
+        "text": f"""## 📊 总体统计
 
+**文件系统**
 - **总计**: {index.get('total_files', 0)} 个文件
 - **索引**: {len(index_files)}
 - **日志**: {len(daily_files)}
-- **最近更新**: {index.get('last_update', 'N/A')[:16]}
+
+**Agent 记忆**
+- **总 Chunks**: {total_chunks:,}
+- **总索引文件**: {total_indexed}
 
 ---
-目录: `memory/`""",
-        "x": -500,
-        "y": 50,
-        "width": 300,
-        "height": 200,
+更新: {datetime.now().strftime('%Y-%m-%d %H:%M')}""",
+        "x": 400,
+        "y": 100,
+        "width": 350,
+        "height": 280,
         "color": "5"
     })
     
@@ -321,8 +485,14 @@ def main():
     mem_index = index_memory_files()
     print(f"📚 Indexed {mem_index['total_files']} memory files")
     
-    # 生成 Memory Canvas
-    generate_memory_canvas()
+    # 获取 Agent Memory 状态
+    agent_status = get_agent_memory_status()
+    print(f"🤖 Analyzed {len(agent_status)} agents memory")
+    for agent in agent_status:
+        print(f"   - {agent['name']}: {agent['chunks']} chunks")
+    
+    # 生成 Memory Canvas (包含 Agent 分析)
+    generate_memory_canvas(agent_status)
     
     # 读取 cron 数据（需要先导出）
     cron_data = read_json(CRON_EXPORT, {"jobs": []})
