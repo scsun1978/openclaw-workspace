@@ -1,5 +1,0 @@
-{
-  "lastCheck": "2026-02-19T08:01:00+08:00",
-  "forwardedAlerts": [],
-  "description": "RED alert forwarding cache - tracks forwarded alerts to avoid duplicates within 30 minutes"
-}

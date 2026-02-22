@@ -1,0 +1,17 @@
+{
+  "alertForward": {
+    "lastCheck": "2026-02-22T11:20:00+08:00",
+    "forwardedTaskIds": {},
+    "noAlertsSince": "2026-02-19T12:15:00+08:00",
+    "lastResult": "NO_ALERT",
+    "scannedSession": "agent:scsun-monitor-agent:telegram:group:-5186938821"
+  },
+  "redAlert": {
+    "lastCheck": "2026-02-22T11:20:00+08:00",
+    "forwardedAlerts": {}
+  },
+  "heartbeat": {
+    "lastCheck": "2026-02-21T11:12:00+08:00",
+    "status": "normal"
+  }
+}
