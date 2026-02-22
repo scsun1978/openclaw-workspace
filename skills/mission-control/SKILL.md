@@ -43,21 +43,21 @@ metadata:
 
 ## 数据源
 
-### 1. team-tasks 项目文件
-- 位置: `~/.openclaw/workspace/team-tasks/projects/*.json`
-- 包含: code/docs/qa/monitor 各阶段任务状态
+### 1. OpenClaw 内部状态 (通过导出)
+- **Cron Jobs**: `mission-control-export/cron-status.json` (从 cron list 导出)
+- **Sessions**: `mission-control-export/sessions-status.json` (从 sessions_list 导出)
+- **Sub-agents**: `mission-control-export/subagents-status.json` (从 subagents list 导出)
 
-### 2. cron jobs
-- 来源: `cron list` 命令
-- 包含: 所有定时任务
+### 2. 文件系统数据 (直接读取)
+- **Team Tasks**: `team-tasks/projects/*.json`
+- **Memory**: `memory/*.md` + `MEMORY.md`
+- **Heartbeat State**: `memory/heartbeat-state.json`
 
-### 3. agent 会话
-- 来源: `sessions_list` 命令
-- 包含: 运行中的 sub-agents
-
-### 4. memory 文件
-- 来源: `~/.openclaw/workspace/memory/*.md`
-- 包含: 所有记忆记录
+### 3. Obsidian Canvas (写入目标)
+- `Tasks Board.canvas` - 任务看板
+- `Team.canvas` - Agent 组织
+- `Calendar.canvas` - 排程视图
+- `Memory.canvas` - 记忆索引
 
 ## 同步频率
 

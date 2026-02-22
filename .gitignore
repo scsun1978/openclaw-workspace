@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+coverage/
+dist/
+build/
+
+# Temp
+tmp/
+*.tmp
+*.temp
+
+# Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# OpenClaw specific
+.clawdhub/
+.clawhub/
+.openclaw/
+
+# Memory exports (can be regenerated)
+mission-control-export/
+
+# Test artifacts
+__tests__/
+*.test.js
+*.spec.js

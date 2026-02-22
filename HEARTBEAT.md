@@ -12,11 +12,15 @@
 - 同一 project/stage 15 分钟内不重复催办
 - 若已收到有效结果，先回填再推进
 
-## 2. Obsidian Mission Control 同步（Cron 每 5 分钟）
-- Cron Job: obsidian-tasks-sync (d94f92e1-3f68-42d1-848d-0e62737b7831)
-- 同步 Team-Tasks JSON → Obsidian Tasks/ 目录
-- 更新 Tasks Board Canvas 看板视图
-- 无需在 heartbeat 中重复执行
+## 2. Mission Control 自动化（Cron 驱动）
+- **Tasks/Team/Memory Sync**: 每 30 分钟 (cron: 9807f131...)
+  - 自动导出 cron/sessions/subagents 状态到 JSON
+  - 运行 data_bridge.py 更新 Memory/Calendar Canvas
+  - 运行 sync.py 更新 Tasks/Team Canvas
+- **Calendar Sync**: 每 30 分钟 (cron: c319911f...)
+  - 更新 cron 状态并刷新 Calendar Canvas
+- 脚本目录: `skills/mission-control/scripts/`
+- 数据导出目录: `mission-control-export/`
 
 ## 3. 记忆同步（已弃用 Notion）
 - ~~Notion 记忆同步~~ → 删除
