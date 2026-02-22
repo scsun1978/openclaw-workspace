@@ -1,0 +1,130 @@
+{
+  "project": "openclaw-observability",
+  "version": "1.0.0",
+  "created": "2026-02-21T10:00:00Z",
+  "status": "in_progress",
+  "phase": 1,
+  "milestone": "M0",
+  "config": {
+    "servers": {
+      "observability": {
+        "host": "172.16.100.101",
+        "user": "scsun",
+        "port": 22,
+        "has_docker": true
+      },
+      "openclaw": {
+        "host": "172.16.100.235",
+        "user": "scsun",
+        "port": 22,
+        "has_docker": true,
+        "log_path": "/tmp/openclaw/openclaw-*.log"
+      }
+    },
+    "alerting": {
+      "webhook": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=08744e93-5f13-4dad-a32a-194cb0a73657"
+    },
+    "retention": {
+      "loki_days": 7,
+      "victoriametrics_days": 30
+    }
+  },
+  "tasks": [
+    {
+      "id": "T1.1",
+      "title": "部署 VictoriaMetrics",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.101",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "curl localhost:8428 返回 UI",
+      "phase": 1,
+      "priority": "high",
+      "created": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "T1.2",
+      "title": "部署 Loki",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.101",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "curl localhost:3100/ready 返回 OK",
+      "phase": 1,
+      "priority": "high",
+      "created": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "T1.3",
+      "title": "部署 Grafana",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.101",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "可访问 172.16.100.101:3000",
+      "phase": 1,
+      "priority": "high",
+      "created": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "T1.4",
+      "title": "部署 promtail",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.235",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "日志可在 Loki 查询",
+      "phase": 1,
+      "priority": "high",
+      "dependencies": ["T1.2"],
+      "created": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "T1.5",
+      "title": "部署 vmagent",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.235",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "指标可远程写入 VM",
+      "phase": 1,
+      "priority": "high",
+      "dependencies": ["T1.1"],
+      "created": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "T1.6",
+      "title": "Health Dashboard",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.101",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "显示 CPU/RAM/FD/进程状态",
+      "phase": 1,
+      "priority": "medium",
+      "dependencies": ["T1.1", "T1.3"],
+      "created": "2026-02-21T10:00:00Z"
+    },
+    {
+      "id": "T1.7",
+      "title": "Workload Dashboard",
+      "assignee": "code-agent",
+      "target_server": "172.16.100.101",
+      "estimate_hours": 1,
+      "status": "pending",
+      "acceptance": "显示会话数/错误率",
+      "phase": 1,
+      "priority": "medium",
+      "dependencies": ["T1.1", "T1.2", "T1.3"],
+      "created": "2026-02-21T10:00:00Z"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2026-02-21T10:00:00Z",
+      "event": "project_created",
+      "actor": "scsun",
+      "details": "Phase 0 确认完成，项目初始化"
+    }
+  ]
+}

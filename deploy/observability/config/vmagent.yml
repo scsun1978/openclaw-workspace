@@ -1,0 +1,25 @@
+# vmagent 配置 - 部署在 172.16.100.235
+# 采集指标发送到 VictoriaMetrics (172.16.100.101:8428)
+
+global:
+  scrape_interval: 15s
+  external_labels:
+    node: openclaw-235
+
+remoteWrite:
+  - url: http://172.16.100.101:8428/api/v1/write
+
+scrape_configs:
+  # OpenClaw 进程监控（需要 node_exporter）
+  - job_name: node_exporter
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          instance: openclaw-node
+
+  # 如果有 process-exporter
+  - job_name: process_exporter
+    static_configs:
+      - targets: ['localhost:9256']
+        labels:
+          instance: openclaw-node
